@@ -1,14 +1,27 @@
 package util
 
-import "strconv"
+import (
+	"strconv"
+	"time"
+)
 
-type zsetItem struct {
+type ZSetItem struct {
 	val   string
 	score string
 }
 
-type zsetRes struct {
-	res []zsetItem
+func NewZSetItem() *ZSetItem { // 返回结构体ZSetItem实例的指针
+	item := new(ZSetItem)
+	return item
+}
+
+type ZSetRes struct {
+	set []ZSetItem
+}
+
+func NewZSetRes() *ZSetRes { // 返回结构体ZSetRes实例的指针
+	res := new(ZSetRes)
+	return res
 }
 
 const (
@@ -28,3 +41,9 @@ func GetFollowerKey(userId int64) string {
 	// int64 直接强转 string 会解析成utf8
 	return SERVICE_NAME + KEY_INTERVAL + FOLLOWER_PREFIX + KEY_INTERVAL + strconv.FormatInt(userId, 10)
 }
+
+// 获取当前时间 秒级格式化
+func GetFollowedTimeStr() string {
+	return time.Now().Format("20060102150402")
+}
+

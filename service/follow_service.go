@@ -1,9 +1,10 @@
 package service
 
 import (
-	"encoding/json"
 	"fmt"
+	"log"
 	redisUtil "relationmicor/util"
+	"strconv"
 	"time"
 )
 
@@ -35,7 +36,10 @@ func Follow(myUid int64, targetUid int64) error {
 	key := redisUtil.GetFollowKey(myUid)
 	// 关注 关注时间是now
 	// todo 互关加入好友
-	_, err := redisUtil.Zadd(key, time.Now().Unix(), targetUid)
+	// todo 我关注别人的同时 也要我成为别人的粉丝
+	// 关注时间 精确到秒级
+	// zset 超过17位会精度丢失
+	_, err := redisUtil.Zadd(key, redisUtil.GetFollowedTimeStr(), targetUid)
 	if err != nil {
 		return fmt.Errorf("follow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
@@ -51,6 +55,7 @@ func UnFollow(myUid int64, targetUid int64) error {
 	// 获取key
 	key := redisUtil.GetFollowKey(myUid)
 	// todo 取关 如果是好友的话 删除好友
+	// todo 我取关别人的同时，也要从别人的粉丝中消失
 	_, err := redisUtil.Zrem(key, targetUid)
 	if err != nil {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
@@ -70,11 +75,29 @@ func FindFollowList(userId int64) ([]FollowUser, error) {
 		return nil, fmt.Errorf("FindFollowList: userId:%d, exception:%s", userId, err)
 	}
 
-	for _, v := range res {
-		json.Unmarshal(v.([]byte), &followItem)
+
+	zsetMap := redisUtil.WithScoreConvert(res)
+
+	for key, score := range zsetMap {
+		// 关注时间
+		if followItem.followedTime, err = time.ParseInLocation("20060102150405", score, time.Local); err != nil {
+			log.Printf("FindFollowList: userId:%d ParseInLocation exception:%s", userId, err)
+			continue
+		}
+
+
+		// userId
+		if followItem.userId, err = strconv.ParseInt(key, 10, 64); err != nil {
+			log.Printf("FindFollowList: userId:%d parseInt exception:%s", userId, err)
+			continue
+		}
 		followList = append(followList, followItem)
-		//fmt.Printf("%s\n", v.([]byte))
 	}
+
+	//for _, a := range followList {
+	//	fmt.Println(a)
+	//}
+
 	return followList, nil
 }
 

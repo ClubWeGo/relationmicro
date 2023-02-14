@@ -8,19 +8,19 @@ import (
 
 // 关注
 func TestFollow(t *testing.T) {
-	err := Follow(1, 2)
+	err := Follow(12, 2)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = Follow(1, 3)
+	err = Follow(12, 3)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = Follow(1, 4)
+	err = Follow(12, 4)
 	if err != nil {
 		fmt.Println(err)
 	}
-	err = Follow(1, 5)
+	err = Follow(12, 5)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -52,12 +52,12 @@ func TestUnFollowSame(t *testing.T) {
 
 // 获取关注集合
 func TestFindFollowList(t *testing.T) {
-	list, err := FindFollowList(1)
+	list, err := FindFollowList(12)
 	if err != nil {
 		fmt.Printf("TestFindFollowList exception:%s", err)
 	}
 	for _, a := range list {
-		fmt.Println(a)
+		fmt.Println(a.userId, a.followedTime)
 	}
 }
 

@@ -3,6 +3,7 @@ package util
 import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
+	"log"
 )
 
 const (
@@ -48,10 +49,10 @@ func Init() {
 	defer conn.Close()
 
 	if _, err := conn.Do("PING"); err != nil {
-		fmt.Printf("PING err %s", err)
+		log.Printf("PING err %s", err)
 	}
 
-	fmt.Println("redis pool init success")
+	log.Println("redis pool init success")
 
 }
 
@@ -61,7 +62,7 @@ func Close() {
 	}
 }
 
-func Zadd(key string, score int64, value int64) (interface{}, error) {
+func Zadd(key string, score string, value int64) (interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
 	return conn.Do("zadd", key, score, value)
@@ -117,4 +118,22 @@ func FindLowOffset(key string, offset int, limit int) ([]interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
 	return redis.Values(conn.Do("zrevrangebyscore", key, "+inf", "-inf", "withscores", "limit", offset, limit))
+}
+
+// withscore 返回 需要转换
+func WithScoreConvert(resp []interface{}) map[string]string {
+	var res = make(map[string]string)
+	var key, score = "", ""
+	for i, v := range resp {
+		if i%2 == 0 {
+			//json.Unmarshal(v.([]byte), &item.val)
+			// todo 不知道有字符集乱码情况没有 目前没发现
+			key = string(v.([]byte))
+		} else {
+			//json.Unmarshal(v.([]byte), &item.score)
+			score = string(v.([]byte))
+			res[key] = score
+		}
+	}
+	return res
 }
