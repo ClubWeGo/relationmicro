@@ -107,16 +107,21 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 	var followList = FollowList{}
 
 	key := redisUtil.GetFollowKey(targetUid)
-	// 按关注时间 从新到老展示
+
+	// 拿到按关注时间 从新到老 的关注者userId
 	res, err := redisUtil.FindTopVal(key)
 	if err != nil {
 		return followList, fmt.Errorf("FindFollowList: mUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
 
-	// []val -> followList 封装
+	// []int64 的followUserId 为填入昵称作预备
+	var followUserIds = make([]int64, 0, 0)
+	// []followUserId (string) -> followList 封装
 	for _, val := range res {
 		// target 的 关注者 userId
-		if followUserId, err := strconv.ParseInt(val, 10, 64); err != nil {
+		followUserId, err := strconv.ParseInt(val, 10, 64)
+		followUserIds = append(followUserIds, followUserId)
+		if err != nil {
 			log.Printf("FindFollowList: mUid:%d, targetUid:%d, parseInt exception:%s", myUid, targetUid, err)
 			continue
 		} else {
@@ -124,8 +129,64 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 			followUser := FindFollowOther(myUid, followUserId)
 			followList.userList = append(followList.userList, followUser)
 		}
+
 	}
+	// 去缓存拿到用户名集合并填入
+	SetFollowNameByUserIds(&followList, followUserIds)
+	//nameMap := FindUserNameByUserIdSet(followUserIds)
+	//if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList.userList) {
+	//	for _, u := range followList.userList {
+	//		// map 若无key 返回 ""
+	//		if name := nameMap[u.id]; name != "" {
+	//			u.name = name
+	//		}
+	//	}
+	//}
+
 	return followList, nil
+}
+
+/**
+redis 拿到的集合串 封装成 FollowList
+*/
+//func PackageFollowListByRes(followList *FollowList, res []string, followUserIds []int64) {
+//	for _, val := range res {
+//		// target 的 关注者 userId
+//		followUserId, err := strconv.ParseInt(val, 10, 64)
+//		followUserIds = append(followUserIds, followUserId)
+//		if err != nil {
+//			log.Printf("FindFollowList: mUid:%d, targetUid:%d, parseInt exception:%s", myUid, targetUid, err)
+//			continue
+//		} else {
+//			// 查询target关注者的 其他信息&我与target关注者的关系
+//			followUser := FindFollowOther(myUid, followUserId)
+//			followList.userList = append(followList.userList, followUser)
+//		}
+//
+//	}
+//}
+
+/*
+*
+根据userIds 获取 对应的 昵称集合
+填入followList中
+*/
+func SetFollowNameByUserIds(followList *FollowList, followUserIds []int64) {
+	nameMap := FindUserNameByUserIdSet(followUserIds)
+
+	fmt.Println("nameMap: ")
+	for k,v := range nameMap {
+		fmt.Println(k, v)
+	}
+
+	if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList.userList) {
+		for i, u := range followList.userList {
+			// map 若无key 返回 ""
+			if name := nameMap[u.id]; name != "" {
+				followList.userList[i].name = name
+			}
+		}
+	}
 }
 
 /*
@@ -133,7 +194,8 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 查询关注用户的其他信息
 */
 func FindFollowOther(myId int64, followUserId int64) FollowUser {
-	var followUser = FollowUser{id: followUserId}
+	var followUser = FollowUser{id: followUserId, name: redisUtil.USER_DEFAULT_NAME}
+	// todo 查询用户名
 	followUser.followCount = FindFollowCount(followUserId)
 	followUser.followerCount = FindFollowerCount(followUserId)
 	followUser.isFollow = FindIsFollow(myId, followUserId)

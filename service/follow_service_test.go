@@ -54,7 +54,7 @@ func TestUnFollowSame(t *testing.T) {
 func TestFindFollowList(t *testing.T) {
 	list, err := FindFollowList(1, 12)
 	if err != nil {
-		fmt.Printf("TestFindFollowList exception:%s", err)
+		t.Errorf("TestFindFollowList exception:%s", err)
 	}
 	for _, a := range list.userList {
 		fmt.Println(a)

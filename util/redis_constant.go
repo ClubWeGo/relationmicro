@@ -25,11 +25,12 @@ func NewZSetRes() *ZSetRes { // 返回结构体ZSetRes实例的指针
 }
 
 const (
-	SERVICE_NAME    = "relation" // 服务名
-	KEY_INTERVAL    = "_"        // 键名间隔
-	FOLLOW_PREFIX   = "follow"   // 关注 前缀
-	FOLLOWER_PREFIX = "follower"
-	USER_NAME_SUFFIX = "uname"
+	SERVICE_NAME      = "relation" // 服务名
+	KEY_INTERVAL      = "_"        // 键名间隔
+	FOLLOW_PREFIX     = "follow"   // 关注 前缀
+	FOLLOWER_PREFIX   = "follower"
+	USER_NAME_SUFFIX  = "uname"
+	USER_DEFAULT_NAME = "unknow"
 )
 
 // 关注集合Key
@@ -52,4 +53,3 @@ func GetFollowedTimeStr() string {
 func GetUserNameKey() string {
 	return SERVICE_NAME + KEY_INTERVAL + USER_NAME_SUFFIX
 }
-
