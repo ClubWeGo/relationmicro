@@ -29,6 +29,7 @@ const (
 	KEY_INTERVAL    = "_"        // 键名间隔
 	FOLLOW_PREFIX   = "follow"   // 关注 前缀
 	FOLLOWER_PREFIX = "follower"
+	USER_NAME_SUFFIX = "uname"
 )
 
 // 关注集合Key
@@ -45,5 +46,10 @@ func GetFollowerKey(userId int64) string {
 // 获取当前时间 秒级格式化
 func GetFollowedTimeStr() string {
 	return time.Now().Format("20060102150402")
+}
+
+// 获取用户昵称集合键
+func GetUserNameKey() string {
+	return SERVICE_NAME + KEY_INTERVAL + USER_NAME_SUFFIX
 }
 

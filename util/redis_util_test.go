@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"log"
 	"testing"
 )
 
@@ -41,6 +42,19 @@ func TestWithScoreConvert(t *testing.T) {
 	for k, v := range res {
 		fmt.Println(k, v)
 	}
+}
+
+func TestHMGetI64ReturnMapI64(t *testing.T) {
+	key := GetUserNameKey()
+	userIds := []int64{1, 2, 3, 4}
+	resMap, err := HMGetI64ReturnMapI64(key, userIds...)
+	if err != nil {
+		log.Fatal("TestHMGetI64ReturnMapI64 exception：", err)
+	}
+	for k, v := range resMap {
+		fmt.Println(k, v)
+	}
+
 }
 
 func TestMain(m *testing.M) {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
+	"strconv"
 )
 
 const (
@@ -136,4 +137,66 @@ func WithScoreConvert(resp []interface{}) map[string]string {
 		}
 	}
 	return res
+}
+
+/*
+*
+获取hash的多个字段
+*/
+func HMGet(key string, fields ...string) ([]interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Values(conn.Do("hmget", fields))
+}
+
+/*
+*
+获取hash的多个字段 field 为 int64
+*/
+func HMGetFiledI64(key string, fields ...int64) ([]interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	l := len(fields)
+	var is = make([]interface{}, l, l)
+	for i, field := range fields {
+		is[i] = field
+	}
+	fieldsStr := ""
+	for _, field := range fields {
+		fieldsStr += " " + strconv.FormatInt(field, 10)
+	}
+	fmt.Println(redis.Args{}.Add(is...))
+	return redis.Values(conn.Do("hmget", redis.Args{}.Add(key).Add(is...)...))
+}
+
+/*
+*
+根据 int64的fields 返回 map<int64, string> field-val
+*/
+func HMGetI64ReturnMapI64(key string, fields ...int64) (map[int64]string, error) {
+	res, err := HMGetFiledI64(key, fields...)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("HMGetFiledI64 end, res:%s", res)
+	return ConvertHashFieldI64(fields, res), nil
+}
+
+// hmget 返回 需要转换
+func ConvertHashFieldI64(fields []int64, resp []interface{}) map[int64]string {
+	var resMap = make(map[int64]string)
+	idLen := len(fields)
+	for i, item := range resp {
+		// 避免两集合长度对不上的情况
+		if i >= idLen {
+			log.Fatal("HashConvertFieldI64 根据userIds查出来的userNames长度对不上")
+			continue
+		}
+		var name = "unknown"
+		if item != nil {
+			name = string(item.([]byte))
+		}
+		resMap[fields[i]] = name
+	}
+	return resMap
 }

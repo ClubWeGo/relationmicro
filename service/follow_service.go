@@ -25,6 +25,10 @@ func Init() {
 关注
 myUid: 我的userId
 targetUid：关注目标userId
+1、targetUid添加到关注集合
+2、myUid添加到粉丝集合
+3、存入两个用户的name 避免db消耗
+#保证原子
 */
 func Follow(myUid int64, targetUid int64) error {
 	// 校验参数
@@ -47,6 +51,11 @@ func Follow(myUid int64, targetUid int64) error {
 }
 
 // 取关
+/**
+1、targetUid从my关注集合删除
+2、myUid从target粉丝集合删除
+# 保证原子
+ */
 func UnFollow(myUid int64, targetUid int64) error {
 	// 校验参数
 	if err := CheckFollowParam(myUid, targetUid); err != nil {
