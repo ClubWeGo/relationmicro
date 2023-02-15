@@ -107,7 +107,6 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 	var followList = FollowList{}
 
 	key := redisUtil.GetFollowKey(targetUid)
-
 	// 拿到按关注时间 从新到老 的关注者userId
 	res, err := redisUtil.FindTopVal(key)
 	if err != nil {
@@ -129,20 +128,9 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 			followUser := FindFollowOther(myUid, followUserId)
 			followList.userList = append(followList.userList, followUser)
 		}
-
 	}
 	// 去缓存拿到用户名集合并填入
 	SetFollowNameByUserIds(&followList, followUserIds)
-	//nameMap := FindUserNameByUserIdSet(followUserIds)
-	//if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList.userList) {
-	//	for _, u := range followList.userList {
-	//		// map 若无key 返回 ""
-	//		if name := nameMap[u.id]; name != "" {
-	//			u.name = name
-	//		}
-	//	}
-	//}
-
 	return followList, nil
 }
 
