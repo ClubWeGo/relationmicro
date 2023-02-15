@@ -5,14 +5,13 @@ import (
 	"log"
 	redisUtil "relationmicor/util"
 	"strconv"
-	"time"
 )
 
-// 关注者
-type FollowUser struct {
-	userId       int64
-	followedTime time.Time // 关注时间
-}
+//// 关注者
+//type FollowUser struct {
+//	userId       int64
+//	followedTime time.Time // 关注时间
+//}
 
 /*
 *
@@ -28,13 +27,15 @@ type FollowUser struct {
 	]
 */
 type FollowList struct {
-	userList []struct {
-		id             int64
-		name           string // 昵称
-		follow_count   int64  // 关注数
-		follower_count int64  // 粉丝数
-		is_follow      bool   // 是否关注 true-已关注 false-未关注
-	}
+	userList []FollowUser
+}
+
+type FollowUser struct {
+	id            int64
+	name          string // 昵称
+	followCount   int64  // 关注数
+	followerCount int64  // 粉丝数
+	isFollow      bool   // 是否关注 true-已关注 false-未关注
 }
 
 func Init() {
@@ -64,6 +65,7 @@ func Follow(myUid int64, targetUid int64) error {
 	// 关注 关注时间是now
 	// todo 互关加入好友
 	// todo 我关注别人的同时 也要我成为别人的粉丝
+	// todo zset score值也可以使用用户等级 或者 两者的关系程度 但接口文档没提供用户等级、关系等级 只能用关注时间
 	// 关注时间 精确到秒级
 	// zset 超过17位会精度丢失
 	_, err := redisUtil.Zadd(key, redisUtil.GetFollowedTimeStr(), targetUid)
@@ -96,28 +98,46 @@ func UnFollow(myUid int64, targetUid int64) error {
 }
 
 // 接口文档没给分页接口
-// 查询关注集合
-func FindFollowList(userId int64) ([]FollowUser, error) {
-	var followList = make([]FollowUser, 0, 0)
-	var followItem FollowUser
+/**
+查询关注集合
+myUid: 我的userId
+targetUid: 查询目标userId
+*/
+func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
+	var followList = FollowList{}
 
-	key := redisUtil.GetFollowKey(userId)
+	key := redisUtil.GetFollowKey(targetUid)
+	// 按关注时间 从新到老展示
 	res, err := redisUtil.FindTopVal(key)
 	if err != nil {
-		return nil, fmt.Errorf("FindFollowList: userId:%d, exception:%s", userId, err)
+		return followList, fmt.Errorf("FindFollowList: mUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
 
-	//zset := redisUtil.WithScoreConvert(res)
-	// []val -> followList
+	// []val -> followList 封装
 	for _, val := range res {
-		// userId
-		if followItem.userId, err = strconv.ParseInt(val, 10, 64); err != nil {
-			log.Printf("FindFollowList: userId:%d parseInt exception:%s", userId, err)
+		// target 的 关注者 userId
+		if followUserId, err := strconv.ParseInt(val, 10, 64); err != nil {
+			log.Printf("FindFollowList: mUid:%d, targetUid:%d, parseInt exception:%s", myUid, targetUid, err)
 			continue
+		} else {
+			// 查询target关注者的 其他信息&我与target关注者的关系
+			followUser := FindFollowOther(myUid, followUserId)
+			followList.userList = append(followList.userList, followUser)
 		}
-		followList = append(followList, followItem)
 	}
 	return followList, nil
+}
+
+/*
+*
+查询关注用户的其他信息
+*/
+func FindFollowOther(myId int64, followUserId int64) FollowUser {
+	var followUser = FollowUser{id: followUserId}
+	followUser.followCount = FindFollowCount(followUserId)
+	followUser.followerCount = FindFollowerCount(followUserId)
+	followUser.isFollow = FindIsFollow(myId, followUserId)
+	return followUser
 }
 
 /*

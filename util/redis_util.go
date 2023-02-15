@@ -177,12 +177,72 @@ func WithScoreConvert(resp []interface{}) map[string]string {
 
 /*
 *
+设置hash的字段值
+*/
+func HSet(key string, field string, value string) (interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return conn.Do("hset", key, field, value)
+}
+
+/*
+*
+设置hash的字段值 filed int64
+*/
+func HSetI64(key string, field int64, value string) (interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return conn.Do("hset", key, field, value)
+}
+
+/*
+*
+设置hash的多个字段
+*/
+func HMSet(key string, fieldAndValues ...string) ([]interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	l := len(fieldAndValues)
+	var is = make([]interface{}, l, l)
+	for i, field := range fieldAndValues {
+		is[i] = field
+	}
+	return redis.Values(conn.Do("hmset", redis.Args{}.Add(key).Add(is...)...))
+}
+
+/*
+*
+获取hash的字段值
+*/
+func HGet(key string, field string) (string, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("hget", key, field))
+}
+
+/*
+*
+获取hash的字段值 field int64
+*/
+func HGetI64(key string, field int64) (string, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("hget", key, field))
+}
+
+/*
+*
 获取hash的多个字段
 */
 func HMGet(key string, fields ...string) ([]interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
-	return redis.Values(conn.Do("hmget", fields))
+	l := len(fields)
+	var is = make([]interface{}, l, l)
+	for i, field := range fields {
+		is[i] = field
+	}
+	return redis.Values(conn.Do("hmget", redis.Args{}.Add(key).Add(is...)...))
 }
 
 /*

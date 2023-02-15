@@ -87,6 +87,22 @@ func TestFindZSetNoneExists(t *testing.T) {
 	fmt.Printf("TestFindZSetNoneExists exists: %v", exists)
 }
 
+func TestHSetI64(t *testing.T) {
+	key := GetUserNameKey()
+	if _, err := HSetI64(key, 3, "zhang3"); err != nil {
+		t.Errorf("TestHSetI64 exception: %s", err)
+	}
+}
+
+func TestHGetI64(t *testing.T) {
+	key := GetUserNameKey()
+	name, err := HGetI64(key, 3)
+	if err != nil {
+		t.Errorf("TestHGetI64 exception: %s", err)
+	}
+	fmt.Println(name)
+}
+
 func TestMain(m *testing.M) {
 	//fmt.Println("begin")
 	Init()

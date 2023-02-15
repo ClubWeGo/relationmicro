@@ -52,12 +52,12 @@ func TestUnFollowSame(t *testing.T) {
 
 // 获取关注集合
 func TestFindFollowList(t *testing.T) {
-	list, err := FindFollowList(12)
+	list, err := FindFollowList(1, 12)
 	if err != nil {
 		fmt.Printf("TestFindFollowList exception:%s", err)
 	}
-	for _, a := range list {
-		fmt.Println(a.userId, a.followedTime)
+	for _, a := range list.userList {
+		fmt.Println(a)
 	}
 }
 
