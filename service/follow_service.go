@@ -79,34 +79,21 @@ func FindFollowList(userId int64) ([]FollowUser, error) {
 	var followItem FollowUser
 
 	key := redisUtil.GetFollowKey(userId)
-	res, err := redisUtil.FindTop(key)
+	res, err := redisUtil.FindTopVal(key)
 	if err != nil {
 		return nil, fmt.Errorf("FindFollowList: userId:%d, exception:%s", userId, err)
 	}
 
-
-	zsetMap := redisUtil.WithScoreConvert(res)
-
-	for key, score := range zsetMap {
-		// 关注时间
-		if followItem.followedTime, err = time.ParseInLocation("20060102150405", score, time.Local); err != nil {
-			log.Printf("FindFollowList: userId:%d ParseInLocation exception:%s", userId, err)
-			continue
-		}
-
-
+	//zset := redisUtil.WithScoreConvert(res)
+	// []val -> followList
+	for _, val := range res {
 		// userId
-		if followItem.userId, err = strconv.ParseInt(key, 10, 64); err != nil {
+		if followItem.userId, err = strconv.ParseInt(val, 10, 64); err != nil {
 			log.Printf("FindFollowList: userId:%d parseInt exception:%s", userId, err)
 			continue
 		}
 		followList = append(followList, followItem)
 	}
-
-	//for _, a := range followList {
-	//	fmt.Println(a)
-	//}
-
 	return followList, nil
 }
 

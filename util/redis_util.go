@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/gomodule/redigo/redis"
 	"log"
-	"strconv"
 )
 
 const (
@@ -100,6 +99,13 @@ func FindTop(key string) ([]interface{}, error) {
 	return redis.Values(conn.Do("zrevrangebyscore", key, "+inf", "-inf", "withscores"))
 }
 
+// zset 从大到小 只返回value
+func FindTopVal(key string) ([]string, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Strings(conn.Do("zrevrangebyscore", redis.Args{}.Add(key).Add("+inf").Add("-inf")...))
+}
+
 // zset 从大到小 + 偏移
 func FindTopOffset(key string, offset int, limit int) ([]interface{}, error) {
 	conn := pool.Get()
@@ -120,6 +126,20 @@ func FindLowOffset(key string, offset int, limit int) ([]interface{}, error) {
 	defer conn.Close()
 	return redis.Values(conn.Do("zrevrangebyscore", key, "+inf", "-inf", "withscores", "limit", offset, limit))
 }
+
+// zset 元素总数量
+func FindZSetCount(key string) (int64, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Int64(conn.Do("zcount", redis.Args{}.Add(key).Add("-inf").Add("+inf")...))
+}
+
+//// zset 元素总数量
+//func FindZSetCountByRange(key string, ) (int64, error) {
+//	conn := pool.Get()
+//	defer conn.Close()
+//	return redis.Int64(conn.Do("zcount", redis.Args{}.Add(key).Add("-inf").Add("+inf")))
+//}
 
 // withscore 返回 需要转换
 func WithScoreConvert(resp []interface{}) map[string]string {
@@ -156,14 +176,11 @@ func HMGet(key string, fields ...string) ([]interface{}, error) {
 func HMGetFiledI64(key string, fields ...int64) ([]interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
+	// int64 不能直接添加到 redis参数 需要转换为 []interface{}
 	l := len(fields)
 	var is = make([]interface{}, l, l)
 	for i, field := range fields {
 		is[i] = field
-	}
-	fieldsStr := ""
-	for _, field := range fields {
-		fieldsStr += " " + strconv.FormatInt(field, 10)
 	}
 	fmt.Println(redis.Args{}.Add(is...))
 	return redis.Values(conn.Do("hmget", redis.Args{}.Add(key).Add(is...)...))

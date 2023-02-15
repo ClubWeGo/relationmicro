@@ -57,6 +57,16 @@ func TestHMGetI64ReturnMapI64(t *testing.T) {
 
 }
 
+func TestFindZSetCount(t *testing.T) {
+	key := GetFollowKey(12)
+
+	count, err := FindZSetCount(key)
+	if err != nil {
+		log.Println("TestFindZSetCount exception:", err)
+	}
+	fmt.Println("zsetCount:", count)
+}
+
 func TestMain(m *testing.M) {
 	//fmt.Println("begin")
 	Init()
