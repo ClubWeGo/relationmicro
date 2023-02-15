@@ -67,6 +67,26 @@ func TestFindZSetCount(t *testing.T) {
 	fmt.Println("zsetCount:", count)
 }
 
+// zset 存在
+func TestFindZSetExists(t *testing.T) {
+	key := GetFollowKey(12)
+	exists, err := FindZSetIsExists(key, 2)
+	if err != nil {
+		log.Fatal("TestFindZSetExists exception:", err)
+	}
+	fmt.Printf("TestFindZSetExists exists: %v", exists)
+}
+
+// zset 不存在
+func TestFindZSetNoneExists(t *testing.T) {
+	key := GetFollowKey(12)
+	exists, err := FindZSetIsExists(key, 0)
+	if err != nil {
+		log.Fatal("TestFindZSetNoneExists exception:", err)
+	}
+	fmt.Printf("TestFindZSetNoneExists exists: %v", exists)
+}
+
 func TestMain(m *testing.M) {
 	//fmt.Println("begin")
 	Init()

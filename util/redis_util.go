@@ -131,15 +131,31 @@ func FindLowOffset(key string, offset int, limit int) ([]interface{}, error) {
 func FindZSetCount(key string) (int64, error) {
 	conn := pool.Get()
 	defer conn.Close()
-	return redis.Int64(conn.Do("zcount", redis.Args{}.Add(key).Add("-inf").Add("+inf")...))
+	return redis.Int64(conn.Do("zcard", key))
 }
 
-//// zset 元素总数量
-//func FindZSetCountByRange(key string, ) (int64, error) {
-//	conn := pool.Get()
-//	defer conn.Close()
-//	return redis.Int64(conn.Do("zcount", redis.Args{}.Add(key).Add("-inf").Add("+inf")))
-//}
+// zset 元素总数量 + 范围
+func FindZSetCountByRange(key string, min string, max string) (int64, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Int64(conn.Do("zcount", redis.Args{}.Add(key).Add(min).Add(max)...))
+}
+
+// ZSet value值是否存在
+func FindZSetIsExists(key string, value int64) (bool, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	reply, err := conn.Do("zrank", redis.Args{}.Add(key).Add(value)...)
+	if err != nil {
+		return false, err
+	}
+	// 转int 如果结果为nil 会转换失败 则返回false
+	if _, err := redis.Int64(reply, nil); err != nil {
+		return false, err
+	}
+	return true, nil
+
+}
 
 // withscore 返回 需要转换
 func WithScoreConvert(resp []interface{}) map[string]string {
@@ -206,7 +222,7 @@ func ConvertHashFieldI64(fields []int64, resp []interface{}) map[int64]string {
 	for i, item := range resp {
 		// 避免两集合长度对不上的情况
 		if i >= idLen {
-			log.Fatal("HashConvertFieldI64 根据userIds查出来的userNames长度对不上")
+			log.Printf("HashConvertFieldI64 根据userIds查出来的userNames长度对不上")
 			continue
 		}
 		var name = "unknown"

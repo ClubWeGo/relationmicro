@@ -14,6 +14,29 @@ type FollowUser struct {
 	followedTime time.Time // 关注时间
 }
 
+/*
+*
+"user_list": [
+
+	    {
+	        "id": 0,
+	        "name": "string",
+	        "follow_count": 0,
+	        "follower_count": 0,
+	        "is_follow": true
+	    }
+	]
+*/
+type FollowList struct {
+	userList []struct {
+		id             int64
+		name           string // 昵称
+		follow_count   int64  // 关注数
+		follower_count int64  // 粉丝数
+		is_follow      bool   // 是否关注 true-已关注 false-未关注
+	}
+}
+
 func Init() {
 	redisUtil.Init()
 }
@@ -55,7 +78,7 @@ func Follow(myUid int64, targetUid int64) error {
 1、targetUid从my关注集合删除
 2、myUid从target粉丝集合删除
 # 保证原子
- */
+*/
 func UnFollow(myUid int64, targetUid int64) error {
 	// 校验参数
 	if err := CheckFollowParam(myUid, targetUid); err != nil {
@@ -97,10 +120,53 @@ func FindFollowList(userId int64) ([]FollowUser, error) {
 	return followList, nil
 }
 
+/*
+*
+查询用户的关注数
+*/
+func FindFollowCount(userId int64) int64 {
+	key := redisUtil.GetFollowKey(userId)
+	count, err := redisUtil.FindZSetCount(key)
+	// 异常返回0值
+	if err != nil {
+		log.Printf("FindFollowCount: userId:%d, redis findZSetCount exception:%s", userId, err)
+	}
+	return count
+}
+
+/*
+*
+查询我是否关注target
+*/
+func FindIsFollow(myUid int64, targetUid int64) bool {
+	key := redisUtil.GetFollowKey(myUid)
+	exists, err := redisUtil.FindZSetIsExists(key, targetUid)
+	if err != nil {
+		log.Printf("FindIsFollow: myUid:%d, targetUid:%d, redis FindZSetIsExists exception:%s", myUid, targetUid, err)
+	}
+	return exists
+}
+
+/*
+*
+校验参数
+*/
 func CheckFollowParam(myUid int64, targetUid int64) error {
 	// 不能关注自己 不能取关自己
 	if myUid == targetUid {
 		return fmt.Errorf("param exception myUid and targetUid the same")
 	}
 	return nil
+}
+
+/*
+*
+校验userId 是否正常范围内
+放在control层好一点
+*/
+func CheckUserId(userId int64) error {
+	if userId > 0 {
+		return nil
+	}
+	return fmt.Errorf("userId:%d out of range", userId)
 }

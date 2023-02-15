@@ -61,6 +61,18 @@ func TestFindFollowList(t *testing.T) {
 	}
 }
 
+func TestFindIsFollow(t *testing.T) {
+	isFollow := FindIsFollow(12, 5)
+	fmt.Println(isFollow)
+}
+
+func TestFindNoneFollow(t *testing.T) {
+	isFollow := FindIsFollow(12, -1)
+	fmt.Println(isFollow)
+}
+
+
+
 func TestMain(m *testing.M) {
 	redisUtil.Init()
 	m.Run()
