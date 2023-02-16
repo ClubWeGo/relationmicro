@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	redisUtil "relationmicor/util"
 	"testing"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 // 关注
@@ -71,9 +72,16 @@ func TestFindNoneFollow(t *testing.T) {
 	fmt.Println(isFollow)
 }
 
-
-
 func TestMain(m *testing.M) {
-	redisUtil.Init()
+	config := redisUtil.Config{
+		Url:         "localhost:6379",
+		Password:    "123456",
+		DB:          0,
+		MaxIdle:     10,
+		MaxActive:   10,
+		IdleTimeOut: 300,
+	}
+
+	redisUtil.Init(config)
 	m.Run()
 }

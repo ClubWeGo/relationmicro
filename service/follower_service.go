@@ -3,8 +3,9 @@ package service
 import (
 	"fmt"
 	"log"
-	redisUtil "relationmicor/util"
 	"strconv"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 type FollowerList struct {

@@ -3,8 +3,9 @@ package service
 import (
 	"fmt"
 	"log"
-	redisUtil "relationmicor/util"
 	"strconv"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 //// 关注者
@@ -38,8 +39,8 @@ type FollowUser struct {
 	isFollow      bool   // 是否关注 true-已关注 false-未关注
 }
 
-func Init() {
-	redisUtil.Init()
+func Init(config redisUtil.Config) {
+	redisUtil.Init(config)
 }
 
 //var redisUtil = util.
@@ -163,7 +164,7 @@ func SetFollowNameByUserIds(followList *FollowList, followUserIds []int64) {
 	nameMap := FindUserNameByUserIdSet(followUserIds)
 
 	fmt.Println("nameMap: ")
-	for k,v := range nameMap {
+	for k, v := range nameMap {
 		fmt.Println(k, v)
 	}
 
