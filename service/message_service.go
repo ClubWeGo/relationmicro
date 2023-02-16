@@ -2,10 +2,11 @@ package service
 
 import (
 	"fmt"
-	redisUtil "relationmicor/util"
 	"strconv"
 	"strings"
 	"time"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 type Message struct {

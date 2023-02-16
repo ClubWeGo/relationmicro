@@ -2,9 +2,9 @@ package main
 
 import (
 	"log"
-	message "relationmicor/kitex_gen/message/messageservice"
-	relation "relationmicor/kitex_gen/relation/relationservice"
-	redisUtil "relationmicor/util"
+
+	relation "github.com/ClubWeGo/relationmicro/kitex_gen/relation/relationservice"
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 func main() {
@@ -20,16 +20,8 @@ func main() {
 
 	redisUtil.Init(config)
 
-	Rsvr := relation.NewServer(new(RelationServiceImpl))
-
-	err := Rsvr.Run()
-
-	if err != nil {
-		log.Println(err.Error())
-	}
-
-	Msvr := message.NewServer(new(MessageServiceImpl))
-	err = Msvr.Run()
+	svr := relation.NewServer(new(CombineServiceImpl))
+	err := svr.Run()
 	if err != nil {
 		log.Println(err.Error())
 	}

@@ -2,45 +2,42 @@ package main
 
 import (
 	"context"
-	message "relationmicor/kitex_gen/message"
-	relation "relationmicor/kitex_gen/relation"
-	"relationmicor/service"
+
+	message "github.com/ClubWeGo/relationmicro/kitex_gen/message"
+	relation "github.com/ClubWeGo/relationmicro/kitex_gen/relation"
+	"github.com/ClubWeGo/relationmicro/service"
 )
 
-// RelationServiceImpl implements the last service interface defined in the IDL.
-type RelationServiceImpl struct{}
+// CombineServiceImpl implements the last service interface defined in the IDL.
+type CombineServiceImpl struct{}
 
 // ActionMethod implements the RelationServiceImpl interface.
-func (s *RelationServiceImpl) ActionMethod(ctx context.Context, request *relation.ActionReq) (resp *relation.ActionResp, err error) {
+func (s *CombineServiceImpl) ActionMethod(ctx context.Context, request *relation.ActionReq) (resp *relation.ActionResp, err error) {
 	// TODO: Your code here...
 	return
 }
 
 // GetFollowAndFollowerMethod implements the RelationServiceImpl interface.
-func (s *RelationServiceImpl) GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq) (resp *relation.GetFollowAndFollowerResp, err error) {
+func (s *CombineServiceImpl) GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq) (resp *relation.GetFollowAndFollowerResp, err error) {
 	// TODO: Your code here...
 	return
 }
 
 // GetFollowListReqMethod implements the RelationServiceImpl interface.
-func (s *RelationServiceImpl) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
+func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
 	// TODO: Your code here...
 	return
 }
 
 // GetFollowerListMethod implements the RelationServiceImpl interface.
-func (s *RelationServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
+func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
 	// TODO: Your code here...
 	return
 }
 
-// RelationServiceImpl implements the last service interface defined in the IDL.
-type MessageServiceImpl struct{}
-
 // GetAllMessageMethod implements the MessageServiceImpl interface.
-func (s *MessageServiceImpl) GetAllMessageMethod(ctx context.Context, request *message.GetAllMessageReq) (resp *message.GetAllMessageResp, err error) {
+func (s *CombineServiceImpl) GetAllMessageMethod(ctx context.Context, request *relation.GetAllMessageReq) (resp *relation.GetAllMessageResp, err error) {
 	// TODO: Your code here...
-
 	// service层拿数据
 	msgs, err := service.GetAllP2PMsg(request.UserId, request.ToUserId)
 
@@ -69,9 +66,8 @@ func (s *MessageServiceImpl) GetAllMessageMethod(ctx context.Context, request *m
 }
 
 // SendMessageMethod implements the MessageServiceImpl interface.
-func (s *MessageServiceImpl) SendMessageMethod(ctx context.Context, request *message.SendMessageReq) (resp *message.SendMessageResp, err error) {
+func (s *CombineServiceImpl) SendMessageMethod(ctx context.Context, request *relation.SendMessageReq) (resp *relation.SendMessageResp, err error) {
 	// TODO: Your code here...
-
 	// service层拿数据
 	_, err = service.SendP2PMsg(request.UserId, request.ToUserId, request.Content)
 	if err != nil {

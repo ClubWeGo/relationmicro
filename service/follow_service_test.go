@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	redisUtil "relationmicor/util"
 	"testing"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 // 关注

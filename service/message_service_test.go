@@ -2,8 +2,9 @@ package service
 
 import (
 	"fmt"
-	redisUtil "relationmicor/util"
 	"testing"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 // go test -v message_service_test.go message_service.go
