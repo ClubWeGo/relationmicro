@@ -53,23 +53,26 @@ struct GetFollowAndFollowerResp {
 
 // 获取关注列表
 struct GetFollowListReq {
-    // 用户id
-    1: required i64 user_id;
+    1: optional i64 myId;     // 发出请求的userId
+    2: required i64 targetId; // 查询目标userId
 }
 
 
 struct GetFollowListResp {
+    1: required string statusCode;
     // 关注的用户列表
-    1: required list<User> user_list;
+    2: required list<User> userList;
 }
 
 // 获取粉丝列表
 struct GetFollowerListReq {
-    1: required i64 user_id; // 用户id
+    1: optional i64 myId;       // 发出请求的userId
+    2: required i64 targetId;   // 查询目标userId
 }
 
 struct GetFollowerListResp {
-    1: required list<User> user_list; // 用户列表
+    1: required string statusCode;
+    2: required list<User> user_list; // 粉丝用户列表
 }
 
 service RelationService {
