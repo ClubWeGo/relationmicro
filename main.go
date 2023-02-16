@@ -2,9 +2,13 @@ package main
 
 import (
 	"log"
+	"net"
 
-	relation "github.com/ClubWeGo/relationmicro/kitex_gen/relation/relationservice"
+	relationmicro "github.com/ClubWeGo/relationmicro/kitex_gen/relation/relationservice"
 	redisUtil "github.com/ClubWeGo/relationmicro/util"
+	"github.com/cloudwego/kitex/pkg/rpcinfo"
+	"github.com/cloudwego/kitex/server"
+	etcd "github.com/kitex-contrib/registry-etcd"
 )
 
 func main() {
@@ -20,8 +24,18 @@ func main() {
 
 	redisUtil.Init(config)
 
-	svr := relation.NewServer(new(CombineServiceImpl))
-	err := svr.Run()
+	r, err := etcd.NewEtcdRegistry([]string{"0.0.0.0:2379"})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	addr, _ := net.ResolveTCPAddr("tcp", "0.0.0.0:10002")
+	svr := relationmicro.NewServer(new(CombineServiceImpl),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "userservice"}),
+		server.WithRegistry(r),
+		server.WithServiceAddr(addr))
+
+	err = svr.Run()
 	if err != nil {
 		log.Println(err.Error())
 	}
