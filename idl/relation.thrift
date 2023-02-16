@@ -83,6 +83,3 @@ service RelationService {
     GetFollowerListResp GetFollowerListMethod(1: GetFollowerListReq request)
 }
 
-
-
-

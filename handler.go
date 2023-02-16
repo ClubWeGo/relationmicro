@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	message "relationmicor/kitex_gen/message"
 	relation "relationmicor/kitex_gen/relation"
+	"relationmicor/service"
 )
 
 // RelationServiceImpl implements the last service interface defined in the IDL.
@@ -30,4 +32,54 @@ func (s *RelationServiceImpl) GetFollowListReqMethod(ctx context.Context, reques
 func (s *RelationServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
 	// TODO: Your code here...
 	return
+}
+
+// RelationServiceImpl implements the last service interface defined in the IDL.
+type MessageServiceImpl struct{}
+
+// GetAllMessageMethod implements the MessageServiceImpl interface.
+func (s *MessageServiceImpl) GetAllMessageMethod(ctx context.Context, request *message.GetAllMessageReq) (resp *message.GetAllMessageResp, err error) {
+	// TODO: Your code here...
+
+	// service层拿数据
+	msgs, err := service.GetAllP2PMsg(request.UserId, request.ToUserId)
+
+	if err != nil {
+		return &message.GetAllMessageResp{
+			Status: false,
+			Msg:    []*message.Message{}, //返回空消息
+		}, nil
+	}
+
+	respMsg := make([]*message.Message, len(msgs))
+	for index, msg := range msgs {
+		createTimeString := msg.Create_at.Format("2006-01-02")
+		respMsg[index] = &message.Message{
+			Id:         msg.Id,
+			FromUserId: msg.UserId,
+			ToUserId:   msg.ToUserId,
+			Content:    msg.Content,
+			CreateTime: &createTimeString,
+		}
+	}
+	return &message.GetAllMessageResp{
+		Status: true,
+		Msg:    respMsg,
+	}, nil
+}
+
+// SendMessageMethod implements the MessageServiceImpl interface.
+func (s *MessageServiceImpl) SendMessageMethod(ctx context.Context, request *message.SendMessageReq) (resp *message.SendMessageResp, err error) {
+	// TODO: Your code here...
+
+	// service层拿数据
+	_, err = service.SendP2PMsg(request.UserId, request.ToUserId, request.Content)
+	if err != nil {
+		return &message.SendMessageResp{
+			Status: false,
+		}, err
+	}
+	return &message.SendMessageResp{
+		Status: true,
+	}, nil
 }
