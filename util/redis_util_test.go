@@ -105,7 +105,17 @@ func TestHGetI64(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	//fmt.Println("begin")
-	Init()
+
+	config := Config{
+		Url:         "localhost:6379",
+		Password:    "123456",
+		DB:          0,
+		MaxIdle:     10,
+		MaxActive:   10,
+		IdleTimeOut: 300,
+	}
+
+	Init(config)
 	m.Run()
 	//println(GetFollowedTimeStr())
 	Close()

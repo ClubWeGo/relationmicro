@@ -2,7 +2,8 @@ package service
 
 import (
 	"log"
-	redisUtil "relationmicor/util"
+
+	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
 /*

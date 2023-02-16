@@ -2,43 +2,56 @@ package util
 
 import (
 	"fmt"
-	"github.com/gomodule/redigo/redis"
 	"log"
+	"time"
+
+	"github.com/gomodule/redigo/redis"
 )
 
-const (
-	url      = "localhost:6379"
-	password = "123456"
-	db       = 0 // 选择的db号
+// const (
+// 	url      = "localhost:6379"
+// 	password = "123456"
+// 	db       = 0 // 选择的db号
+
+// 	// 连接池参数
+// 	maxIdle     = 10  // 初始连接数
+// 	maxActive   = 10  // 最大连接数
+// 	idleTimeOut = 300 // 最长空闲时间
+// )
+
+type Config struct {
+	Url      string
+	Password string
+	DB       int // 选择的db号
 
 	// 连接池参数
-	maxIdle     = 10  // 初始连接数
-	maxActive   = 10  // 最大连接数
-	idleTimeOut = 300 // 最长空闲时间
-)
+	MaxIdle     int // 初始连接数
+	MaxActive   int // 最大连接数
+	IdleTimeOut int // 最长空闲时间
+}
 
 var pool *redis.Pool
 
-func Init() {
+func Init(config Config) {
 	pool = &redis.Pool{
-		MaxIdle:     maxIdle,     //最初的连接数量
-		MaxActive:   maxActive,   //连接池最大连接数量,（0表示自动定义），按需分配
-		IdleTimeout: idleTimeOut, //连接关闭时间 300秒 （300秒不使用自动关闭）
+		MaxIdle:     config.MaxIdle,                    //最初的连接数量
+		MaxActive:   config.MaxActive,                  //连接池最大连接数量,（0表示自动定义），按需分配
+		IdleTimeout: time.Duration(config.IdleTimeOut), //连接关闭时间 300秒 （300秒不使用自动关闭）
 		// 连接
 		Dial: func() (redis.Conn, error) { //要连接的redis数据库
 			// 建立tcp连接
-			c, err := redis.Dial("tcp", url)
+			c, err := redis.Dial("tcp", config.Url)
 			if err != nil {
 				return nil, err
 			}
 			// 验证密码
-			if _, err := c.Do("AUTH", password); err != nil {
+			if _, err := c.Do("AUTH", config.Password); err != nil {
 				c.Close()
 				return nil, err
 			}
 
 			// 选择库
-			if _, err := c.Do("SELECT", db); err != nil {
+			if _, err := c.Do("SELECT", config.DB); err != nil {
 				c.Close()
 				return nil, err
 			}
@@ -292,4 +305,52 @@ func ConvertHashFieldI64(fields []int64, resp []interface{}) map[int64]string {
 		resMap[fields[i]] = name
 	}
 	return resMap
+}
+
+/*
+ * message utils
+ */
+
+// reference :
+// https://blog.csdn.net/li_w_ch/article/details/110638434
+// https://juejin.cn/post/7112825943231561741
+
+// 创建一条流消息
+func XADD(roomId, msgid, userId, toUserId, value string, maxlen int32) (string, error) {
+	// roomId 聊天室房间号
+	// msgId 消息号 推荐使用默认 * , 自带时间戳支持范围查询
+	// key 标识用户id
+	// value 消息内容
+	// maxlen 默认-1表示不限制长度，可手动指定大小限制stream的长度
+	conn := pool.Get()
+	defer conn.Close()
+	fromToString := fmt.Sprintf("%v_%v", userId, toUserId)
+	if maxlen == -1 {
+		return redis.String(conn.Do("XADD", roomId, "*", "from_to", fromToString, "content", value))
+	}
+	return redis.String(conn.Do("XADD", roomId, "*", "MAXLEN ~", maxlen, "from_to", fromToString, "content", value)) //模糊限制
+	// 返回结果为消息的ID, reply -> 1676530008466-0
+}
+
+// 删除一条流消息
+func XDEL(roomId, msgId string) (string, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("XDEL", roomId, msgId))
+}
+
+// 删除房间内所有消息
+func XDELALL(roomId string) (string, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.String(conn.Do("XTRIM", roomId, "MAXLEN", 0))
+}
+
+/*
+XREVRANGE 倒序取max-min范围内数据
+*/
+func XREVRANGE(roomId string, start string, end string) ([]interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Values(conn.Do("XREVRANGE", roomId, start, end))
 }
