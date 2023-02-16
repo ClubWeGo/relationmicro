@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 
-	message "github.com/ClubWeGo/relationmicro/kitex_gen/message"
 	relation "github.com/ClubWeGo/relationmicro/kitex_gen/relation"
 	"github.com/ClubWeGo/relationmicro/service"
 )
@@ -42,16 +41,16 @@ func (s *CombineServiceImpl) GetAllMessageMethod(ctx context.Context, request *r
 	msgs, err := service.GetAllP2PMsg(request.UserId, request.ToUserId)
 
 	if err != nil {
-		return &message.GetAllMessageResp{
+		return &relation.GetAllMessageResp{
 			Status: false,
-			Msg:    []*message.Message{}, //返回空消息
+			Msg:    []*relation.Message{}, //返回空消息
 		}, nil
 	}
 
-	respMsg := make([]*message.Message, len(msgs))
+	respMsg := make([]*relation.Message, len(msgs))
 	for index, msg := range msgs {
 		createTimeString := msg.Create_at.Format("2006-01-02")
-		respMsg[index] = &message.Message{
+		respMsg[index] = &relation.Message{
 			Id:         msg.Id,
 			FromUserId: msg.UserId,
 			ToUserId:   msg.ToUserId,
@@ -59,7 +58,7 @@ func (s *CombineServiceImpl) GetAllMessageMethod(ctx context.Context, request *r
 			CreateTime: &createTimeString,
 		}
 	}
-	return &message.GetAllMessageResp{
+	return &relation.GetAllMessageResp{
 		Status: true,
 		Msg:    respMsg,
 	}, nil
@@ -71,11 +70,11 @@ func (s *CombineServiceImpl) SendMessageMethod(ctx context.Context, request *rel
 	// service层拿数据
 	_, err = service.SendP2PMsg(request.UserId, request.ToUserId, request.Content)
 	if err != nil {
-		return &message.SendMessageResp{
+		return &relation.SendMessageResp{
 			Status: false,
 		}, err
 	}
-	return &message.SendMessageResp{
+	return &relation.SendMessageResp{
 		Status: true,
 	}, nil
 }
