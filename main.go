@@ -31,7 +31,7 @@ func main() {
 
 	addr, _ := net.ResolveTCPAddr("tcp", "0.0.0.0:10002")
 	svr := relationmicro.NewServer(new(CombineServiceImpl),
-		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "userservice"}),
+		server.WithServerBasicInfo(&rpcinfo.EndpointBasicInfo{ServiceName: "relationservice"}),
 		server.WithRegistry(r),
 		server.WithServiceAddr(addr))
 
