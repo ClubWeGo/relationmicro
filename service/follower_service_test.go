@@ -10,7 +10,7 @@ func TestFindFollowerList(t *testing.T) {
 	if err != nil {
 		t.Errorf("%s", err)
 	}
-	for _, u := range list.userList {
+	for _, u := range list {
 		fmt.Println(u)
 	}
 }

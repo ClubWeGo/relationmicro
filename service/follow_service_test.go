@@ -57,7 +57,7 @@ func TestFindFollowList(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestFindFollowList exception:%s", err)
 	}
-	for _, a := range list.userList {
+	for _, a := range list {
 		fmt.Println(a)
 	}
 }

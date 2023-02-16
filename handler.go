@@ -2,13 +2,21 @@ package main
 
 import (
 	"context"
+	"fmt"
 
 	relation "github.com/ClubWeGo/relationmicro/kitex_gen/relation"
 	"github.com/ClubWeGo/relationmicro/service"
 )
 
+const(
+	ERROR = "0"
+	SUCCESS = "1"
+)
+
 // CombineServiceImpl implements the last service interface defined in the IDL.
 type CombineServiceImpl struct{}
+
+
 
 // ActionMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) ActionMethod(ctx context.Context, request *relation.ActionReq) (resp *relation.ActionResp, err error) {
@@ -25,13 +33,73 @@ func (s *CombineServiceImpl) GetFollowAndFollowerMethod(ctx context.Context, req
 // GetFollowListReqMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
 	// TODO: Your code here...
-	return
+	myId := request.MyId
+	targetId := request.TargetId
+	// todo 参数校验
+	//if myId != nil && *myId == targetId {
+	//
+	//}
+	followList, err := service.FindFollowList(*myId, targetId)
+
+	if err != nil {
+		return &relation.GetFollowListResp{
+			StatusCode: ERROR,
+			UserList: []*relation.User{},
+		}, err
+	}
+
+	// 封装响应
+	respUserList := make([]*relation.User, len(followList))
+	for i, followUser := range followList {
+		fmt.Println(followUser)
+		respUserList[i] = &relation.User{
+			Id: followUser.Id,
+			Name: followUser.Name,
+			FollowCount: followUser.FollowCount,
+			FollowerCount: followUser.FollowerCount,
+			IsFollow: followUser.IsFollow,
+		}
+	}
+	return &relation.GetFollowListResp{
+		StatusCode: SUCCESS,
+		UserList: respUserList,
+	}, err
+
+
+
 }
 
 // GetFollowerListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
 	// TODO: Your code here...
-	return
+	myId := request.MyId
+	targetId := request.TargetId
+	// todo 参数校验
+
+	followerList, err := service.FindFollowerList(*myId, targetId)
+	if err != nil {
+		return &relation.GetFollowerListResp{
+			StatusCode: ERROR,
+			UserList: []*relation.User{},
+
+		}, err
+	}
+	// 封装响应
+	respUserList := make([]*relation.User, len(followerList))
+	for i, followerUser := range followerList {
+		respUserList[i] = &relation.User{
+			Id: followerUser.Id,
+			Name: followerUser.Name,
+			FollowCount: followerUser.FollowCount,
+			FollowerCount: followerUser.FollowerCount,
+			IsFollow: followerUser.IsFollow,
+		}
+	}
+	return &relation.GetFollowerListResp{
+		StatusCode: SUCCESS,
+		UserList: respUserList,
+
+	}, nil
 }
 
 // GetAllMessageMethod implements the MessageServiceImpl interface.
