@@ -60,19 +60,19 @@ func Follow(myUid int64, targetUid int64) error {
 	if err := CheckFollowParam(myUid, targetUid); err != nil {
 		return fmt.Errorf("follow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
-
 	// 获取key
-	key := redisUtil.GetFollowKey(myUid)
-	// 关注 关注时间是now
-	// todo 互关加入好友
-	// todo 我关注别人的同时 也要我成为别人的粉丝
+	followKey := redisUtil.GetFollowKey(myUid)
+	followerKey := redisUtil.GetFollowerKey(targetUid)
+	// 关注时间 精确到秒级 zset 超过17位会精度丢失
 	// todo zset score值也可以使用用户等级 或者 两者的关系程度 但接口文档没提供用户等级、关系等级 只能用关注时间
-	// 关注时间 精确到秒级
-	// zset 超过17位会精度丢失
-	_, err := redisUtil.Zadd(key, redisUtil.GetFollowedTimeStr(), targetUid)
+	nowTimeStr := redisUtil.GetFollowedTimeStr()
+	// 我关注别人的同时 也要我成为别人的粉丝 lua脚本保证原子性
+	scriptStr := redisUtil.GetFollowScript()
+	_, err := redisUtil.Eval(scriptStr, 2, followKey, followerKey, nowTimeStr, targetUid, myUid)
 	if err != nil {
-		return fmt.Errorf("follow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
+		return fmt.Errorf("follow myUid:%d, targetUid:%d redis lua eval exception: %s", myUid, targetUid, err)
 	}
+
 	return nil
 }
 

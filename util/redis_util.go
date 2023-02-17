@@ -33,6 +33,9 @@ type Config struct {
 var pool *redis.Pool
 
 func Init(config Config) {
+	// 加载lua脚本
+	InitLoadLua()
+
 	pool = &redis.Pool{
 		MaxIdle:     config.MaxIdle,                    //最初的连接数量
 		MaxActive:   config.MaxActive,                  //连接池最大连接数量,（0表示自动定义），按需分配
@@ -353,4 +356,16 @@ func XREVRANGE(roomId string, start string, end string) ([]interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
 	return redis.Values(conn.Do("XREVRANGE", roomId, start, end))
+}
+
+/*
+*
+eval 执行lua脚本
+*/
+func Eval(script string, keyNumber int, keyArgvs ...interface{}) (int, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	// 参数转换为 []interface{}
+	//is := StrArrToInterfaceArr(keyArgvs)
+	return redis.Int(conn.Do("eval", redis.Args{}.Add(script).Add(keyNumber).Add(keyArgvs...)...))
 }

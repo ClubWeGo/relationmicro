@@ -9,21 +9,21 @@ import (
 
 // 关注
 func TestFollow(t *testing.T) {
-	err := Follow(12, 2)
+	err := Follow(2001, 2002)
 	if err != nil {
-		fmt.Println(err)
+		t.Error(err)
 	}
-	err = Follow(12, 3)
+	err = Follow(2001, 2003)
 	if err != nil {
-		fmt.Println(err)
+		t.Error(err)
 	}
-	err = Follow(12, 4)
+	err = Follow(2001, 2004)
 	if err != nil {
-		fmt.Println(err)
+		t.Error(err)
 	}
-	err = Follow(12, 5)
+	err = Follow(2001, 2005)
 	if err != nil {
-		fmt.Println(err)
+		t.Error(err)
 	}
 }
 
