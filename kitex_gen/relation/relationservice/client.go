@@ -11,10 +11,11 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
-	ActionMethod(ctx context.Context, request *relation.ActionReq, callOptions ...callopt.Option) (r *relation.ActionResp, err error)
-	GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq, callOptions ...callopt.Option) (r *relation.GetFollowAndFollowerResp, err error)
+	FollowMethod(ctx context.Context, request *relation.FollowReq, callOptions ...callopt.Option) (r *relation.FollowResp, err error)
+	GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq, callOptions ...callopt.Option) (r *relation.GetFollowInfoResp, err error)
 	GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error)
 	GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error)
+	GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error)
 }
 
 // NewClient creates a client for the service defined in IDL.
@@ -46,14 +47,14 @@ type kRelationServiceClient struct {
 	*kClient
 }
 
-func (p *kRelationServiceClient) ActionMethod(ctx context.Context, request *relation.ActionReq, callOptions ...callopt.Option) (r *relation.ActionResp, err error) {
+func (p *kRelationServiceClient) FollowMethod(ctx context.Context, request *relation.FollowReq, callOptions ...callopt.Option) (r *relation.FollowResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.ActionMethod(ctx, request)
+	return p.kClient.FollowMethod(ctx, request)
 }
 
-func (p *kRelationServiceClient) GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq, callOptions ...callopt.Option) (r *relation.GetFollowAndFollowerResp, err error) {
+func (p *kRelationServiceClient) GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq, callOptions ...callopt.Option) (r *relation.GetFollowInfoResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetFollowAndFollowerMethod(ctx, request)
+	return p.kClient.GetFollowInfoMethod(ctx, request)
 }
 
 func (p *kRelationServiceClient) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error) {
@@ -64,4 +65,9 @@ func (p *kRelationServiceClient) GetFollowListReqMethod(ctx context.Context, req
 func (p *kRelationServiceClient) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFollowerListMethod(ctx, request)
+}
+
+func (p *kRelationServiceClient) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFriendListMethod(ctx, request)
 }

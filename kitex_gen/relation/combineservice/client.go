@@ -11,10 +11,11 @@ import (
 
 // Client is designed to provide IDL-compatible methods with call-option parameter for kitex framework.
 type Client interface {
-	ActionMethod(ctx context.Context, request *relation.ActionReq, callOptions ...callopt.Option) (r *relation.ActionResp, err error)
-	GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq, callOptions ...callopt.Option) (r *relation.GetFollowAndFollowerResp, err error)
+	FollowMethod(ctx context.Context, request *relation.FollowReq, callOptions ...callopt.Option) (r *relation.FollowResp, err error)
+	GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq, callOptions ...callopt.Option) (r *relation.GetFollowInfoResp, err error)
 	GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error)
 	GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error)
+	GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error)
 	GetAllMessageMethod(ctx context.Context, request *relation.GetAllMessageReq, callOptions ...callopt.Option) (r *relation.GetAllMessageResp, err error)
 	SendMessageMethod(ctx context.Context, request *relation.SendMessageReq, callOptions ...callopt.Option) (r *relation.SendMessageResp, err error)
 }
@@ -48,14 +49,14 @@ type kCombineServiceClient struct {
 	*kClient
 }
 
-func (p *kCombineServiceClient) ActionMethod(ctx context.Context, request *relation.ActionReq, callOptions ...callopt.Option) (r *relation.ActionResp, err error) {
+func (p *kCombineServiceClient) FollowMethod(ctx context.Context, request *relation.FollowReq, callOptions ...callopt.Option) (r *relation.FollowResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.ActionMethod(ctx, request)
+	return p.kClient.FollowMethod(ctx, request)
 }
 
-func (p *kCombineServiceClient) GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq, callOptions ...callopt.Option) (r *relation.GetFollowAndFollowerResp, err error) {
+func (p *kCombineServiceClient) GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq, callOptions ...callopt.Option) (r *relation.GetFollowInfoResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetFollowAndFollowerMethod(ctx, request)
+	return p.kClient.GetFollowInfoMethod(ctx, request)
 }
 
 func (p *kCombineServiceClient) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error) {
@@ -66,6 +67,11 @@ func (p *kCombineServiceClient) GetFollowListReqMethod(ctx context.Context, requ
 func (p *kCombineServiceClient) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFollowerListMethod(ctx, request)
+}
+
+func (p *kCombineServiceClient) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetFriendListMethod(ctx, request)
 }
 
 func (p *kCombineServiceClient) GetAllMessageMethod(ctx context.Context, request *relation.GetAllMessageReq, callOptions ...callopt.Option) (r *relation.GetAllMessageResp, err error) {

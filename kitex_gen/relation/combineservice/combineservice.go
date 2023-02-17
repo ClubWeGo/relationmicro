@@ -24,12 +24,13 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "CombineService"
 	handlerType := (*CombineService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"ActionMethod":               kitex.NewMethodInfo(actionMethodHandler, newRelationServiceActionMethodArgs, newRelationServiceActionMethodResult, false),
-		"GetFollowAndFollowerMethod": kitex.NewMethodInfo(getFollowAndFollowerMethodHandler, newRelationServiceGetFollowAndFollowerMethodArgs, newRelationServiceGetFollowAndFollowerMethodResult, false),
-		"GetFollowListReqMethod":     kitex.NewMethodInfo(getFollowListReqMethodHandler, newRelationServiceGetFollowListReqMethodArgs, newRelationServiceGetFollowListReqMethodResult, false),
-		"GetFollowerListMethod":      kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
-		"GetAllMessageMethod":        kitex.NewMethodInfo(getAllMessageMethodHandler, newMessageServiceGetAllMessageMethodArgs, newMessageServiceGetAllMessageMethodResult, false),
-		"SendMessageMethod":          kitex.NewMethodInfo(sendMessageMethodHandler, newMessageServiceSendMessageMethodArgs, newMessageServiceSendMessageMethodResult, false),
+		"FollowMethod":           kitex.NewMethodInfo(followMethodHandler, newRelationServiceFollowMethodArgs, newRelationServiceFollowMethodResult, false),
+		"GetFollowInfoMethod":    kitex.NewMethodInfo(getFollowInfoMethodHandler, newRelationServiceGetFollowInfoMethodArgs, newRelationServiceGetFollowInfoMethodResult, false),
+		"GetFollowListReqMethod": kitex.NewMethodInfo(getFollowListReqMethodHandler, newRelationServiceGetFollowListReqMethodArgs, newRelationServiceGetFollowListReqMethodResult, false),
+		"GetFollowerListMethod":  kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
+		"GetFriendListMethod":    kitex.NewMethodInfo(getFriendListMethodHandler, newRelationServiceGetFriendListMethodArgs, newRelationServiceGetFriendListMethodResult, false),
+		"GetAllMessageMethod":    kitex.NewMethodInfo(getAllMessageMethodHandler, newMessageServiceGetAllMessageMethodArgs, newMessageServiceGetAllMessageMethodResult, false),
+		"SendMessageMethod":      kitex.NewMethodInfo(sendMessageMethodHandler, newMessageServiceSendMessageMethodArgs, newMessageServiceSendMessageMethodResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "relation",
@@ -46,40 +47,40 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	return svcInfo
 }
 
-func actionMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*relation.RelationServiceActionMethodArgs)
-	realResult := result.(*relation.RelationServiceActionMethodResult)
-	success, err := handler.(relation.RelationService).ActionMethod(ctx, realArg.Request)
+func followMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceFollowMethodArgs)
+	realResult := result.(*relation.RelationServiceFollowMethodResult)
+	success, err := handler.(relation.RelationService).FollowMethod(ctx, realArg.Request)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newRelationServiceActionMethodArgs() interface{} {
-	return relation.NewRelationServiceActionMethodArgs()
+func newRelationServiceFollowMethodArgs() interface{} {
+	return relation.NewRelationServiceFollowMethodArgs()
 }
 
-func newRelationServiceActionMethodResult() interface{} {
-	return relation.NewRelationServiceActionMethodResult()
+func newRelationServiceFollowMethodResult() interface{} {
+	return relation.NewRelationServiceFollowMethodResult()
 }
 
-func getFollowAndFollowerMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*relation.RelationServiceGetFollowAndFollowerMethodArgs)
-	realResult := result.(*relation.RelationServiceGetFollowAndFollowerMethodResult)
-	success, err := handler.(relation.RelationService).GetFollowAndFollowerMethod(ctx, realArg.Request)
+func getFollowInfoMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetFollowInfoMethodArgs)
+	realResult := result.(*relation.RelationServiceGetFollowInfoMethodResult)
+	success, err := handler.(relation.RelationService).GetFollowInfoMethod(ctx, realArg.Request)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newRelationServiceGetFollowAndFollowerMethodArgs() interface{} {
-	return relation.NewRelationServiceGetFollowAndFollowerMethodArgs()
+func newRelationServiceGetFollowInfoMethodArgs() interface{} {
+	return relation.NewRelationServiceGetFollowInfoMethodArgs()
 }
 
-func newRelationServiceGetFollowAndFollowerMethodResult() interface{} {
-	return relation.NewRelationServiceGetFollowAndFollowerMethodResult()
+func newRelationServiceGetFollowInfoMethodResult() interface{} {
+	return relation.NewRelationServiceGetFollowInfoMethodResult()
 }
 
 func getFollowListReqMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -116,6 +117,24 @@ func newRelationServiceGetFollowerListMethodArgs() interface{} {
 
 func newRelationServiceGetFollowerListMethodResult() interface{} {
 	return relation.NewRelationServiceGetFollowerListMethodResult()
+}
+
+func getFriendListMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetFriendListMethodArgs)
+	realResult := result.(*relation.RelationServiceGetFriendListMethodResult)
+	success, err := handler.(relation.RelationService).GetFriendListMethod(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newRelationServiceGetFriendListMethodArgs() interface{} {
+	return relation.NewRelationServiceGetFriendListMethodArgs()
+}
+
+func newRelationServiceGetFriendListMethodResult() interface{} {
+	return relation.NewRelationServiceGetFriendListMethodResult()
 }
 
 func getAllMessageMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -164,21 +183,21 @@ func newServiceClient(c client.Client) *kClient {
 	}
 }
 
-func (p *kClient) ActionMethod(ctx context.Context, request *relation.ActionReq) (r *relation.ActionResp, err error) {
-	var _args relation.RelationServiceActionMethodArgs
+func (p *kClient) FollowMethod(ctx context.Context, request *relation.FollowReq) (r *relation.FollowResp, err error) {
+	var _args relation.RelationServiceFollowMethodArgs
 	_args.Request = request
-	var _result relation.RelationServiceActionMethodResult
-	if err = p.c.Call(ctx, "ActionMethod", &_args, &_result); err != nil {
+	var _result relation.RelationServiceFollowMethodResult
+	if err = p.c.Call(ctx, "FollowMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetFollowAndFollowerMethod(ctx context.Context, request *relation.GetFollowAndFollowerReq) (r *relation.GetFollowAndFollowerResp, err error) {
-	var _args relation.RelationServiceGetFollowAndFollowerMethodArgs
+func (p *kClient) GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq) (r *relation.GetFollowInfoResp, err error) {
+	var _args relation.RelationServiceGetFollowInfoMethodArgs
 	_args.Request = request
-	var _result relation.RelationServiceGetFollowAndFollowerMethodResult
-	if err = p.c.Call(ctx, "GetFollowAndFollowerMethod", &_args, &_result); err != nil {
+	var _result relation.RelationServiceGetFollowInfoMethodResult
+	if err = p.c.Call(ctx, "GetFollowInfoMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
@@ -199,6 +218,16 @@ func (p *kClient) GetFollowerListMethod(ctx context.Context, request *relation.G
 	_args.Request = request
 	var _result relation.RelationServiceGetFollowerListMethodResult
 	if err = p.c.Call(ctx, "GetFollowerListMethod", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq) (r *relation.GetFriendListResp, err error) {
+	var _args relation.RelationServiceGetFriendListMethodArgs
+	_args.Request = request
+	var _result relation.RelationServiceGetFriendListMethodResult
+	if err = p.c.Call(ctx, "GetFriendListMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
