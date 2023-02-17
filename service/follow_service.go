@@ -32,11 +32,11 @@ type FollowList struct {
 }
 
 type FollowUser struct {
-	id            int64
-	name          string // 昵称
-	followCount   int64  // 关注数
-	followerCount int64  // 粉丝数
-	isFollow      bool   // 是否关注 true-已关注 false-未关注
+	Id            int64
+	Name          string // 昵称
+	FollowCount   int64  // 关注数
+	FollowerCount int64  // 粉丝数
+	IsFollow      bool   // 是否关注 true-已关注 false-未关注
 }
 
 func Init(config redisUtil.Config) {
@@ -60,19 +60,19 @@ func Follow(myUid int64, targetUid int64) error {
 	if err := CheckFollowParam(myUid, targetUid); err != nil {
 		return fmt.Errorf("follow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
-
 	// 获取key
-	key := redisUtil.GetFollowKey(myUid)
-	// 关注 关注时间是now
-	// todo 互关加入好友
-	// todo 我关注别人的同时 也要我成为别人的粉丝
+	followKey := redisUtil.GetFollowKey(myUid)
+	followerKey := redisUtil.GetFollowerKey(targetUid)
+	// 关注时间 精确到秒级 zset 超过17位会精度丢失
 	// todo zset score值也可以使用用户等级 或者 两者的关系程度 但接口文档没提供用户等级、关系等级 只能用关注时间
-	// 关注时间 精确到秒级
-	// zset 超过17位会精度丢失
-	_, err := redisUtil.Zadd(key, redisUtil.GetFollowedTimeStr(), targetUid)
+	nowTimeStr := redisUtil.GetFollowedTimeStr()
+	// 我关注别人的同时 也要我成为别人的粉丝 lua脚本保证原子性
+	scriptStr := redisUtil.GetFollowScript()
+	_, err := redisUtil.EvalOptimize(scriptStr, 2, followKey, followerKey, nowTimeStr, targetUid, myUid)
 	if err != nil {
-		return fmt.Errorf("follow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
+		return fmt.Errorf("follow myUid:%d, targetUid:%d redis lua eval exception: %s", myUid, targetUid, err)
 	}
+
 	return nil
 }
 
@@ -88,10 +88,11 @@ func UnFollow(myUid int64, targetUid int64) error {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
 	// 获取key
-	key := redisUtil.GetFollowKey(myUid)
-	// todo 取关 如果是好友的话 删除好友
-	// todo 我取关别人的同时，也要从别人的粉丝中消失
-	_, err := redisUtil.Zrem(key, targetUid)
+	followKey := redisUtil.GetFollowKey(myUid)
+	followerKey := redisUtil.GetFollowerKey(targetUid)
+	scriptStr := redisUtil.GetUnFollowScript()
+	// 将对方从自己的关注列表里删除，同时将自己从对方的粉丝列表删除
+	_, err := redisUtil.EvalOptimize(scriptStr, 2, followKey, followerKey, targetUid, myUid)
 	if err != nil {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
@@ -104,8 +105,8 @@ func UnFollow(myUid int64, targetUid int64) error {
 myUid: 我的userId
 targetUid: 查询目标userId
 */
-func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
-	var followList = FollowList{}
+func FindFollowList(myUid int64, targetUid int64) ([]FollowUser, error) {
+	var followList = make([]FollowUser, 0)
 
 	key := redisUtil.GetFollowKey(targetUid)
 	// 拿到按关注时间 从新到老 的关注者userId
@@ -127,11 +128,11 @@ func FindFollowList(myUid int64, targetUid int64) (FollowList, error) {
 		} else {
 			// 查询target关注者的 其他信息&我与target关注者的关系
 			followUser := FindFollowOther(myUid, followUserId)
-			followList.userList = append(followList.userList, followUser)
+			followList = append(followList, followUser)
 		}
 	}
 	// 去缓存拿到用户名集合并填入
-	SetFollowNameByUserIds(&followList, followUserIds)
+	SetFollowNameByUserIds(followList, followUserIds)
 	return followList, nil
 }
 
@@ -160,7 +161,7 @@ redis 拿到的集合串 封装成 FollowList
 根据userIds 获取 对应的 昵称集合
 填入followList中
 */
-func SetFollowNameByUserIds(followList *FollowList, followUserIds []int64) {
+func SetFollowNameByUserIds(followList []FollowUser, followUserIds []int64) {
 	nameMap := FindUserNameByUserIdSet(followUserIds)
 
 	fmt.Println("nameMap: ")
@@ -168,11 +169,11 @@ func SetFollowNameByUserIds(followList *FollowList, followUserIds []int64) {
 		fmt.Println(k, v)
 	}
 
-	if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList.userList) {
-		for i, u := range followList.userList {
+	if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList) {
+		for i, u := range followList {
 			// map 若无key 返回 ""
-			if name := nameMap[u.id]; name != "" {
-				followList.userList[i].name = name
+			if name := nameMap[u.Id]; name != "" {
+				followList[i].Name = name
 			}
 		}
 	}
@@ -183,11 +184,11 @@ func SetFollowNameByUserIds(followList *FollowList, followUserIds []int64) {
 查询关注用户的其他信息
 */
 func FindFollowOther(myId int64, followUserId int64) FollowUser {
-	var followUser = FollowUser{id: followUserId, name: redisUtil.USER_DEFAULT_NAME}
+	var followUser = FollowUser{Id: followUserId, Name: redisUtil.USER_DEFAULT_NAME}
 	// todo 查询用户名
-	followUser.followCount = FindFollowCount(followUserId)
-	followUser.followerCount = FindFollowerCount(followUserId)
-	followUser.isFollow = FindIsFollow(myId, followUserId)
+	followUser.FollowCount = FindFollowCount(followUserId)
+	followUser.FollowerCount = FindFollowerCount(followUserId)
+	followUser.IsFollow = FindIsFollow(myId, followUserId)
 	return followUser
 }
 

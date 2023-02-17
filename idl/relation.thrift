@@ -19,68 +19,103 @@ struct User {
     5: required bool is_follow;
 }
 
+struct FollowInfo {
+    1: required i64 follow_count;    // 关注数
+    2: required i64 follower_count;  // 粉丝数
+    3: required bool is_follow;      // 是否关注
+}
+
+// 好友
+struct FriendInfo {
+    1:  required i64        id;
+    2:  required string     name;               // 昵称
+    3:  required i64        follow_count;       // 关注数
+    4:  required i64        follower_count;     // 粉丝数
+    5:  required bool       is_follow;          // 是否关注
+    6:  required string     avatar;             // 用户头像url
+    7:  required string     background_image;   // 用户个人页顶部大图url
+    8:  required string     signature;          // 个人简介
+    9:  required i64        total_favorited;    // 获赞数量
+    10: required i64        work_count;         // 作品数
+    11: required i64        favorite_count;     // 喜欢数
+}
+
 // 关注
-struct ActionReq {
-    // 关注对方用户id
-    1: required string to_user_id;
+struct FollowReq {
+    // 发请求的userId
+    1: required i64 my_uid;
+    // 关注目标userId
+    2: required i64 target_uid;
     // 1-关注，2-取消关注
-    2: required string action_type;
+    3: required i32 action_type;
 }
 
-struct ActionResp {
-    // 状态码：0-成功、其他-失败
-    1: required i64 status_code;
-    // 状态信息
-    2: required string status_msg;
-
+struct FollowResp {
+    1: required i32 status_code;
+    2: optional string msg;
 }
 
-// 查询用户 关注数 和 粉丝数
-struct GetFollowAndFollowerReq {
-    // 查询的用户id
-    1: required i64 user_id;
-    2: optional i64 me_id;
+struct GetFollowInfoReq {
+    1: optional i64 my_uid;     // 发请求的userId
+    2: required i64 target_uid; // 目标userId
 }
 
-struct GetFollowAndFollowerResp {
-    // 当前用户是否关注
-    1: required bool is_follow;
-    // 关注数
-    2: required i64 follow_count;
-    // 粉丝数
-    3: required i64 follower_count;
+struct GetFollowInfoResp {
+    1: required i32 status_code;
+    2: optional FollowInfo follow_info; // 用户的关注信息
+    3: optional string msg;
 }
+
+
 
 // 获取关注列表
 struct GetFollowListReq {
-    // 用户id
-    1: required i64 user_id;
+    1: optional i64 myId;     // 发出请求的userId
+    2: required i64 targetId; // 查询目标userId
 }
 
 
 struct GetFollowListResp {
+    1: required i32 statusCode;
     // 关注的用户列表
-    1: required list<User> user_list;
+    2: required list<User> userList;
+    3: optional string msg;
 }
 
 // 获取粉丝列表
 struct GetFollowerListReq {
-    1: required i64 user_id; // 用户id
+    1: optional i64 myId;       // 发出请求的userId
+    2: required i64 targetId;   // 查询目标userId
 }
 
 struct GetFollowerListResp {
-    1: required list<User> user_list; // 用户列表
+    1: required i32 statusCode;
+    2: required list<User> user_list; // 粉丝用户列表
+    3: optional string msg;
+}
+
+struct GetFriendListReq {
+    1: optional i64 myUid;      // 发起请求的userId
+    2: required i64 targetUid;  // 目标userId
+}
+
+struct GetFriendListResp {
+    1: required i32 status_code;
+    2: optional list<FriendInfo> friend_list;
+    3: optional string msg;
 }
 
 service RelationService {
     // 关注
-    ActionResp ActionMethod(1: ActionReq request)
-    // 获取关注数、粉丝数、是否关注
-    GetFollowAndFollowerResp GetFollowAndFollowerMethod(1: GetFollowAndFollowerReq request)
+    FollowResp FollowMethod(1: FollowReq request)
+    // 用户关注信息 关注数 粉丝数 是否关注
+    GetFollowInfoResp GetFollowInfoMethod(1: GetFollowInfoReq request)
     // 获取关注列表
     GetFollowListResp GetFollowListReqMethod(1: GetFollowListReq request)
     // 获取粉丝列表
     GetFollowerListResp GetFollowerListMethod(1: GetFollowerListReq request)
+    // 获取好友列表
+    GetFriendListResp GetFriendListMethod(1: GetFriendListReq request)
 }
 
 // message

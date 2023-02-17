@@ -9,15 +9,15 @@ import (
 )
 
 type FollowerList struct {
-	userList []FollowerUser
+	UserList []FollowerUser
 }
 
 type FollowerUser struct {
-	id            int64
-	name          string // 昵称
-	followCount   int64  // 关注数
-	followerCount int64  // 粉丝数
-	isFollow      bool   // 是否关注 true-已关注 false-未关注
+	Id            int64
+	Name          string // 昵称
+	FollowCount   int64  // 关注数
+	FollowerCount int64  // 粉丝数
+	IsFollow      bool   // 是否关注 true-已关注 false-未关注
 }
 
 /*
@@ -39,8 +39,8 @@ func FindFollowerCount(userId int64) int64 {
 myUid: 我的userId
 targetUid: 查询目标userId
 */
-func FindFollowerList(myUid int64, targetUid int64) (FollowerList, error) {
-	var followerList = FollowerList{}
+func FindFollowerList(myUid int64, targetUid int64) ([]FollowerUser, error) {
+	var followerList = make([]FollowerUser, 0)
 
 	key := redisUtil.GetFollowerKey(targetUid)
 	// 拿到按关注时间 从新到老 的粉丝userId
@@ -62,11 +62,11 @@ func FindFollowerList(myUid int64, targetUid int64) (FollowerList, error) {
 		} else {
 			// 查询target粉丝的 其他信息&我与target粉丝的关系
 			followerUser := FindFollowerOther(myUid, followerUserId)
-			followerList.userList = append(followerList.userList, followerUser)
+			followerList = append(followerList, followerUser)
 		}
 	}
 	// 去缓存拿到用户名集合并填入
-	SetFollowerNameByUserIds(&followerList, followerUserIds)
+	SetFollowerNameByUserIds(followerList, followerUserIds)
 	return followerList, nil
 }
 
@@ -75,7 +75,7 @@ func FindFollowerList(myUid int64, targetUid int64) (FollowerList, error) {
 根据userIds 获取 对应的 昵称集合
 填入followerList中
 */
-func SetFollowerNameByUserIds(followerList *FollowerList, followerUserIds []int64) {
+func SetFollowerNameByUserIds(followerList []FollowerUser, followerUserIds []int64) {
 	nameMap := FindUserNameByUserIdSet(followerUserIds)
 
 	fmt.Println("nameMap: ")
@@ -83,11 +83,11 @@ func SetFollowerNameByUserIds(followerList *FollowerList, followerUserIds []int6
 		fmt.Println(k, v)
 	}
 
-	if nameMap != nil && followerUserIds != nil && len(nameMap) == len(followerList.userList) {
-		for i, u := range followerList.userList {
+	if nameMap != nil && followerUserIds != nil && len(nameMap) == len(followerList) {
+		for i, u := range followerList {
 			// map 若无key 返回 ""
-			if name := nameMap[u.id]; name != "" {
-				followerList.userList[i].name = name
+			if name := nameMap[u.Id]; name != "" {
+				followerList[i].Name = name
 			}
 		}
 	}
@@ -98,10 +98,10 @@ func SetFollowerNameByUserIds(followerList *FollowerList, followerUserIds []int6
 查询粉丝的其他信息
 */
 func FindFollowerOther(myId int64, followerUserId int64) FollowerUser {
-	var followerUser = FollowerUser{id: followerUserId, name: redisUtil.USER_DEFAULT_NAME}
+	var followerUser = FollowerUser{Id: followerUserId, Name: redisUtil.USER_DEFAULT_NAME}
 	// todo 查询用户名
-	followerUser.followCount = FindFollowCount(followerUserId)
-	followerUser.followerCount = FindFollowerCount(followerUserId)
-	followerUser.isFollow = FindIsFollow(myId, followerUserId)
+	followerUser.FollowCount = FindFollowCount(followerUserId)
+	followerUser.FollowerCount = FindFollowerCount(followerUserId)
+	followerUser.IsFollow = FindIsFollow(myId, followerUserId)
 	return followerUser
 }

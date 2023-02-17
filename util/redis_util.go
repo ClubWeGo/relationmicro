@@ -33,6 +33,9 @@ type Config struct {
 var pool *redis.Pool
 
 func Init(config Config) {
+	// 加载lua脚本
+	InitLoadLua()
+
 	pool = &redis.Pool{
 		MaxIdle:     config.MaxIdle,                    //最初的连接数量
 		MaxActive:   config.MaxActive,                  //连接池最大连接数量,（0表示自动定义），按需分配
@@ -271,7 +274,7 @@ func HMGetFiledI64(key string, fields ...int64) ([]interface{}, error) {
 	for i, field := range fields {
 		is[i] = field
 	}
-	fmt.Println(redis.Args{}.Add(is...))
+	//fmt.Println(redis.Args{}.Add(is...))
 	return redis.Values(conn.Do("hmget", redis.Args{}.Add(key).Add(is...)...))
 }
 
@@ -353,4 +356,77 @@ func XREVRANGE(roomId string, start string, end string) ([]interface{}, error) {
 	conn := pool.Get()
 	defer conn.Close()
 	return redis.Values(conn.Do("XREVRANGE", roomId, start, end))
+}
+
+/*
+*
+eval 执行lua脚本
+script：脚本内容
+keyNumber：执行脚本需要多少key
+keyArgvs key和argv
+eval script keyNumber [keys] [argvs]
+*/
+func Eval(script string, keyNumber int, keyArgvs ...interface{}) (interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	// 参数转换为 []interface{}
+	//is := StrArrToInterfaceArr(keyArgvs)
+	// todo 可考虑 redis.NewScript
+	return conn.Do("eval", redis.Args{}.Add(script).Add(keyNumber).Add(keyArgvs...)...)
+}
+
+/*
+*
+根据 lua sha1 直接执行缓存的lua脚本
+*/
+func EvalSha(luaSha1 string, keyNumber int, keyArgvs ...interface{}) (interface{}, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return conn.Do("EVALSHA", redis.Args{}.Add(luaSha1).Add(keyNumber).Add(keyArgvs...)...)
+}
+
+/*
+*
+根据lua的sha1 查看脚本是否缓存
+script exists code1 code2
+可以查多个脚本是否存在 所以返回是数组
+*/
+func ScriptExists(luaSha1 string) ([]int64, error) {
+	conn := pool.Get()
+	defer conn.Close()
+	return redis.Int64s(conn.Do("SCRIPT", "EXISTS", luaSha1))
+}
+
+/*
+*
+redis 返回的数字前面带一个空格 不能直接转
+*/
+func ScriptExistsRtnInt(luaSha1 string) (int, error) {
+	exists, err := ScriptExists(luaSha1)
+	if err != nil {
+		return 0, err
+	}
+	return int(exists[0]), nil
+}
+
+/*
+*
+优化版eval
+利用eval的脚本缓存机制
+*/
+func EvalOptimize(script string, keyNumber int, keyArgvs ...interface{}) (interface{}, error) {
+	sha1, err := GetLuaSha1(script)
+	if err != nil {
+		return "", err
+	}
+	existsCode, err := ScriptExistsRtnInt(sha1)
+	if err != nil {
+		return "", err
+	}
+	if existsCode == 0 {
+		if _, err := Eval(script, keyNumber, keyArgvs...); err != nil {
+			return "", err
+		}
+	}
+	return EvalSha(sha1, keyNumber, keyArgvs...)
 }
