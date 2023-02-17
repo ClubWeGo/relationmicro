@@ -32,13 +32,13 @@ func (s *CombineServiceImpl) GetFollowAndFollowerMethod(ctx context.Context, req
 
 // GetFollowListReqMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
-	// TODO: Your code here...
 	myId := request.MyId
 	targetId := request.TargetId
 	// todo 参数校验
 	//if myId != nil && *myId == targetId {
 	//
 	//}
+	// todo 需要兼容 myId为nil的情况
 	followList, err := service.FindFollowList(*myId, targetId)
 
 	if err != nil {
@@ -71,11 +71,10 @@ func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request
 
 // GetFollowerListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
-	// TODO: Your code here...
 	myId := request.MyId
 	targetId := request.TargetId
 	// todo 参数校验
-
+	// todo 需要兼容 myId为nil的情况
 	followerList, err := service.FindFollowerList(*myId, targetId)
 	if err != nil {
 		return &relation.GetFollowerListResp{
