@@ -9,19 +9,20 @@ import (
 
 // 关注
 func TestFollow(t *testing.T) {
-	err := Follow(2006, 20027)
+	myUid := int64(2016)
+	err := Follow(myUid, 2012)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2006, 2008)
+	err = Follow(myUid, 2013)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2006, 2009)
+	err = Follow(myUid, 2014)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2006, 2009)
+	err = Follow(myUid, 2015)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +38,7 @@ func TestFollowSame(t *testing.T) {
 
 // 取关
 func TestUnFollow(t *testing.T) {
-	err := UnFollow(2006, 2008)
+	err := UnFollow(2011, 2015)
 	if err != nil {
 		fmt.Println(err)
 	}

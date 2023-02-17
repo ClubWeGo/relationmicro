@@ -68,7 +68,7 @@ func Follow(myUid int64, targetUid int64) error {
 	nowTimeStr := redisUtil.GetFollowedTimeStr()
 	// 我关注别人的同时 也要我成为别人的粉丝 lua脚本保证原子性
 	scriptStr := redisUtil.GetFollowScript()
-	_, err := redisUtil.Eval(scriptStr, 2, followKey, followerKey, nowTimeStr, targetUid, myUid)
+	_, err := redisUtil.EvalOptimize(scriptStr, 2, followKey, followerKey, nowTimeStr, targetUid, myUid)
 	if err != nil {
 		return fmt.Errorf("follow myUid:%d, targetUid:%d redis lua eval exception: %s", myUid, targetUid, err)
 	}
@@ -92,7 +92,7 @@ func UnFollow(myUid int64, targetUid int64) error {
 	followerKey := redisUtil.GetFollowerKey(targetUid)
 	scriptStr := redisUtil.GetUnFollowScript()
 	// 将对方从自己的关注列表里删除，同时将自己从对方的粉丝列表删除
-	_, err := redisUtil.Eval(scriptStr, 2, followKey, followerKey, targetUid, myUid)
+	_, err := redisUtil.EvalOptimize(scriptStr, 2, followKey, followerKey, targetUid, myUid)
 	if err != nil {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}

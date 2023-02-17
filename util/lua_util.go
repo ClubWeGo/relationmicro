@@ -1,11 +1,14 @@
 package util
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
+	"fmt"
 	"os"
 )
 
 const (
-	FOLLOW_ADDRESS   = "/util/lua/follow"
+	FOLLOW_ADDRESS     = "/util/lua/follow"
 	UNFOLLOWER_ADDRESS = "/util/lua/unfollow"
 )
 
@@ -32,7 +35,6 @@ redis.call('zrem', KEYS[1], ARGV[1]);
 redis.call('zrem', KEYS[2], ARGV[2]);
 return 1;
 `
-
 
 	// todo golang test run build相对路径不一样 目前没找到通用方法
 	//rootPath, err := GetRootPath()
@@ -82,4 +84,18 @@ func GetRootPath() (string, error) {
 	//index := strings.LastIndex(path, string(os.PathSeparator))
 	//return path[:index]
 	return os.Getwd()
+}
+
+/*
+*
+获取脚本的Sha1
+*/
+func GetLuaSha1(scriptStr string) (string, error) {
+	o := sha1.New()
+	_, err := o.Write([]byte(scriptStr))
+	if err != nil {
+		//log.Errorf("GetLuaSha1 encrypt error, scriptStr:%s", scriptStr)
+		return "", fmt.Errorf("get lua sha1 exception:%s", err)
+	}
+	return hex.EncodeToString(o.Sum(nil)), nil
 }
