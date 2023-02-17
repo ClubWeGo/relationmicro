@@ -88,10 +88,11 @@ func UnFollow(myUid int64, targetUid int64) error {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}
 	// 获取key
-	key := redisUtil.GetFollowKey(myUid)
-	// todo 取关 如果是好友的话 删除好友
-	// todo 我取关别人的同时，也要从别人的粉丝中消失
-	_, err := redisUtil.Zrem(key, targetUid)
+	followKey := redisUtil.GetFollowKey(myUid)
+	followerKey := redisUtil.GetFollowerKey(targetUid)
+	scriptStr := redisUtil.GetUnFollowScript()
+	// 将对方从自己的关注列表里删除，同时将自己从对方的粉丝列表删除
+	_, err := redisUtil.Eval(scriptStr, 2, followKey, followerKey, targetUid, myUid)
 	if err != nil {
 		return fmt.Errorf("unFollow: myUid:%d, targetUid:%d, exception:%s", myUid, targetUid, err)
 	}

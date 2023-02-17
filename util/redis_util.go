@@ -361,6 +361,10 @@ func XREVRANGE(roomId string, start string, end string) ([]interface{}, error) {
 /*
 *
 eval 执行lua脚本
+script：脚本内容
+keyNumber：执行脚本需要多少key
+keyArgvs key和argv
+eval script keyNumber [keys] [argvs]
 */
 func Eval(script string, keyNumber int, keyArgvs ...interface{}) (int, error) {
 	conn := pool.Get()

@@ -9,19 +9,19 @@ import (
 
 // 关注
 func TestFollow(t *testing.T) {
-	err := Follow(2001, 2002)
+	err := Follow(2006, 20027)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2001, 2003)
+	err = Follow(2006, 2008)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2001, 2004)
+	err = Follow(2006, 2009)
 	if err != nil {
 		t.Error(err)
 	}
-	err = Follow(2001, 2005)
+	err = Follow(2006, 2009)
 	if err != nil {
 		t.Error(err)
 	}
@@ -37,7 +37,7 @@ func TestFollowSame(t *testing.T) {
 
 // 取关
 func TestUnFollow(t *testing.T) {
-	err := UnFollow(1, 5)
+	err := UnFollow(2006, 2008)
 	if err != nil {
 		fmt.Println(err)
 	}
