@@ -35,11 +35,11 @@ func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request
 	myId := request.MyId
 	targetId := request.TargetId
 	// 参数校验
-	if verifyMsg := VerifyFindFollowParam(*myId, targetId); verifyMsg != nil {
+	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
 		return &relation.GetFollowListResp{
 			StatusCode: VERIFY,
 			UserList:   []*relation.User{},
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}, nil
 	}
 	// myId 为空 isFollow全为false 无影响
@@ -76,11 +76,11 @@ func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request 
 	myId := request.MyId
 	targetId := request.TargetId
 	// 参数校验
-	if verifyMsg := VerifyFindFollowParam(*myId, targetId); verifyMsg != nil {
+	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
 		return &relation.GetFollowerListResp{
 			StatusCode: VERIFY,
 			UserList:   []*relation.User{},
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}, nil
 	}
 	// myId 为空 isFollow全为false 无影响
@@ -159,7 +159,7 @@ func (s *CombineServiceImpl) FollowMethod(ctx context.Context, request *relation
 	if verifyMsg := VerifyFollowParam(request.MyUid, request.TargetUid); verifyMsg != nil {
 		resp = &relation.FollowResp{
 			StatusCode: VERIFY,
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}
 	}
 	// 关注类型
@@ -190,11 +190,12 @@ func (s *CombineServiceImpl) FollowMethod(ctx context.Context, request *relation
 func (s *CombineServiceImpl) GetFollowInfoMethod(ctx context.Context, req *relation.GetFollowInfoReq) (resp *relation.GetFollowInfoResp, err error) {
 	myUid := req.MyUid
 	targetUid := req.TargetUid
+
 	// 校验请求参数
-	if verifyMsg := VerifyFindFollowParam(*myUid, targetUid); verifyMsg != nil {
+	if verifyMsg := VerifyFindFollowParam(myUid, targetUid); verifyMsg != nil {
 		return &relation.GetFollowInfoResp{
 			StatusCode: VERIFY,
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}, nil
 	}
 
@@ -223,7 +224,7 @@ func VerifyFollowParam(myUid int64, targetUid int64) *string {
 }
 
 // 校验查询关注信息的非法请求参数
-func VerifyFindFollowParam(myUid int64, targetUid int64) *string {
+func VerifyFindFollowParam(myUid *int64, targetUid int64) *string {
 	return nil
 }
 
