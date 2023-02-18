@@ -13,7 +13,7 @@ import (
 type Client interface {
 	FollowMethod(ctx context.Context, request *relation.FollowReq, callOptions ...callopt.Option) (r *relation.FollowResp, err error)
 	GetFollowInfoMethod(ctx context.Context, request *relation.GetFollowInfoReq, callOptions ...callopt.Option) (r *relation.GetFollowInfoResp, err error)
-	GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error)
+	GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error)
 	GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error)
 	GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error)
 }
@@ -57,9 +57,9 @@ func (p *kRelationServiceClient) GetFollowInfoMethod(ctx context.Context, reques
 	return p.kClient.GetFollowInfoMethod(ctx, request)
 }
 
-func (p *kRelationServiceClient) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error) {
+func (p *kRelationServiceClient) GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
-	return p.kClient.GetFollowListReqMethod(ctx, request)
+	return p.kClient.GetFollowListMethod(ctx, request)
 }
 
 func (p *kRelationServiceClient) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error) {

@@ -44,7 +44,7 @@ func main() {
 	//	fmt.Println(user)
 	//}
 
-	followList, err := client.GetFollowListReqMethod(context.Background(), &relation.GetFollowListReq{MyId: myUid, TargetId: 2009})
+	followList, err := client.GetFollowListMethod(context.Background(), &relation.GetFollowListReq{MyId: myUid, TargetId: 2009})
 	if err != nil {
 		log.Println(err)
 	}
