@@ -71,5 +71,7 @@ func main() {
 		fmt.Println(user)
 	}
 
+	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 7777, ActionType: 1})
+	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 20027, ActionType: 2})
 
 }
