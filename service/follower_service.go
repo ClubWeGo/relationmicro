@@ -76,13 +76,8 @@ func FindFollowerList(myUid int64, targetUid int64) ([]FollowerUser, error) {
 填入followerList中
 */
 func SetFollowerNameByUserIds(followerList []FollowerUser, followerUserIds []int64) {
+	// 缓存里拿到userIds对应的names
 	nameMap := FindUserNameByUserIdSet(followerUserIds)
-
-	fmt.Println("nameMap: ")
-	for k, v := range nameMap {
-		fmt.Println(k, v)
-	}
-
 	if nameMap != nil && followerUserIds != nil && len(nameMap) == len(followerList) {
 		for i, u := range followerList {
 			// map 若无key 返回 ""
@@ -91,6 +86,12 @@ func SetFollowerNameByUserIds(followerList []FollowerUser, followerUserIds []int
 			}
 		}
 	}
+
+	fmt.Println("xxx↓")
+	for _, follower := range followerList {
+		fmt.Println(follower.Name)
+	}
+
 }
 
 /*

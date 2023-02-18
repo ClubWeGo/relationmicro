@@ -162,13 +162,8 @@ redis 拿到的集合串 封装成 FollowList
 填入followList中
 */
 func SetFollowNameByUserIds(followList []FollowUser, followUserIds []int64) {
+	// 缓存里拿到userIds 对应的 names
 	nameMap := FindUserNameByUserIdSet(followUserIds)
-
-	fmt.Println("nameMap: ")
-	for k, v := range nameMap {
-		fmt.Println(k, v)
-	}
-
 	if nameMap != nil && followUserIds != nil && len(nameMap) == len(followList) {
 		for i, u := range followList {
 			// map 若无key 返回 ""

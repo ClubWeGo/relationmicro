@@ -53,6 +53,7 @@ func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request 
 	// 封装响应
 	respUserList := make([]*relation.User, len(followerList))
 	for i, followerUser := range followerList {
+		fmt.Println("&" , followerUser.Name)
 		respUserList[i] = &relation.User{
 			Id:            followerUser.Id,
 			Name:          followerUser.Name,
