@@ -111,7 +111,7 @@ service RelationService {
     // 用户关注信息 关注数 粉丝数 是否关注
     GetFollowInfoResp GetFollowInfoMethod(1: GetFollowInfoReq request)
     // 获取关注列表
-    GetFollowListResp GetFollowListReqMethod(1: GetFollowListReq request)
+    GetFollowListResp GetFollowListMethod(1: GetFollowListReq request)
     // 获取粉丝列表
     GetFollowerListResp GetFollowerListMethod(1: GetFollowerListReq request)
     // 获取好友列表

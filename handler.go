@@ -30,57 +30,16 @@ const (
 // CombineServiceImpl implements the last service interface defined in the IDL.
 type CombineServiceImpl struct{}
 
-// GetFollowListReqMethod implements the RelationServiceImpl interface.
-func (s *CombineServiceImpl) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
-	myId := request.MyId
-	targetId := request.TargetId
-	// 参数校验
-	if verifyMsg := VerifyFindFollowParam(*myId, targetId); verifyMsg != nil {
-		return &relation.GetFollowListResp{
-			StatusCode: VERIFY,
-			UserList:   []*relation.User{},
-			Msg: verifyMsg,
-		}, nil
-	}
-	// myId 为空 isFollow全为false 无影响
-	followList, err := service.FindFollowList(*myId, targetId)
-
-	if err != nil {
-		return &relation.GetFollowListResp{
-			StatusCode: ERROR,
-			UserList:   []*relation.User{},
-		}, nil
-	}
-
-	// 封装响应
-	respUserList := make([]*relation.User, len(followList))
-	for i, followUser := range followList {
-		fmt.Println(followUser)
-		respUserList[i] = &relation.User{
-			Id:            followUser.Id,
-			Name:          followUser.Name,
-			FollowCount:   followUser.FollowCount,
-			FollowerCount: followUser.FollowerCount,
-			IsFollow:      followUser.IsFollow,
-		}
-	}
-	return &relation.GetFollowListResp{
-		StatusCode: SUCCESS,
-		UserList:   respUserList,
-	}, err
-
-}
-
 // GetFollowerListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq) (resp *relation.GetFollowerListResp, err error) {
 	myId := request.MyId
 	targetId := request.TargetId
 	// 参数校验
-	if verifyMsg := VerifyFindFollowParam(*myId, targetId); verifyMsg != nil {
+	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
 		return &relation.GetFollowerListResp{
 			StatusCode: VERIFY,
 			UserList:   []*relation.User{},
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}, nil
 	}
 	// myId 为空 isFollow全为false 无影响
@@ -159,7 +118,7 @@ func (s *CombineServiceImpl) FollowMethod(ctx context.Context, request *relation
 	if verifyMsg := VerifyFollowParam(request.MyUid, request.TargetUid); verifyMsg != nil {
 		resp = &relation.FollowResp{
 			StatusCode: VERIFY,
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}
 	}
 	// 关注类型
@@ -190,11 +149,12 @@ func (s *CombineServiceImpl) FollowMethod(ctx context.Context, request *relation
 func (s *CombineServiceImpl) GetFollowInfoMethod(ctx context.Context, req *relation.GetFollowInfoReq) (resp *relation.GetFollowInfoResp, err error) {
 	myUid := req.MyUid
 	targetUid := req.TargetUid
+
 	// 校验请求参数
-	if verifyMsg := VerifyFindFollowParam(*myUid, targetUid); verifyMsg != nil {
+	if verifyMsg := VerifyFindFollowParam(myUid, targetUid); verifyMsg != nil {
 		return &relation.GetFollowInfoResp{
 			StatusCode: VERIFY,
-			Msg: verifyMsg,
+			Msg:        verifyMsg,
 		}, nil
 	}
 
@@ -223,7 +183,7 @@ func VerifyFollowParam(myUid int64, targetUid int64) *string {
 }
 
 // 校验查询关注信息的非法请求参数
-func VerifyFindFollowParam(myUid int64, targetUid int64) *string {
+func VerifyFindFollowParam(myUid *int64, targetUid int64) *string {
 	return nil
 }
 
@@ -231,4 +191,45 @@ func VerifyFindFollowParam(myUid int64, targetUid int64) *string {
 func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq) (resp *relation.GetFriendListResp, err error) {
 	// TODO: Your code here...
 	return
+}
+
+// GetFollowListMethod implements the RelationServiceImpl interface.
+func (s *CombineServiceImpl) GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
+	myId := request.MyId
+	targetId := request.TargetId
+	// 参数校验
+	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
+		return &relation.GetFollowListResp{
+			StatusCode: VERIFY,
+			UserList:   []*relation.User{},
+			Msg:        verifyMsg,
+		}, nil
+	}
+	// myId 为空 isFollow全为false 无影响
+	followList, err := service.FindFollowList(*myId, targetId)
+
+	if err != nil {
+		return &relation.GetFollowListResp{
+			StatusCode: ERROR,
+			UserList:   []*relation.User{},
+		}, nil
+	}
+
+	// 封装响应
+	respUserList := make([]*relation.User, len(followList))
+	for i, followUser := range followList {
+		fmt.Println(followUser)
+		respUserList[i] = &relation.User{
+			Id:            followUser.Id,
+			Name:          followUser.Name,
+			FollowCount:   followUser.FollowCount,
+			FollowerCount: followUser.FollowerCount,
+			IsFollow:      followUser.IsFollow,
+		}
+	}
+	return &relation.GetFollowListResp{
+		StatusCode: SUCCESS,
+		UserList:   respUserList,
+	}, err
+
 }

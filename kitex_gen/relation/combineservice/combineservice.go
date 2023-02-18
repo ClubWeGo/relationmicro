@@ -24,13 +24,13 @@ func NewServiceInfo() *kitex.ServiceInfo {
 	serviceName := "CombineService"
 	handlerType := (*CombineService)(nil)
 	methods := map[string]kitex.MethodInfo{
-		"FollowMethod":           kitex.NewMethodInfo(followMethodHandler, newRelationServiceFollowMethodArgs, newRelationServiceFollowMethodResult, false),
-		"GetFollowInfoMethod":    kitex.NewMethodInfo(getFollowInfoMethodHandler, newRelationServiceGetFollowInfoMethodArgs, newRelationServiceGetFollowInfoMethodResult, false),
-		"GetFollowListReqMethod": kitex.NewMethodInfo(getFollowListReqMethodHandler, newRelationServiceGetFollowListReqMethodArgs, newRelationServiceGetFollowListReqMethodResult, false),
-		"GetFollowerListMethod":  kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
-		"GetFriendListMethod":    kitex.NewMethodInfo(getFriendListMethodHandler, newRelationServiceGetFriendListMethodArgs, newRelationServiceGetFriendListMethodResult, false),
-		"GetAllMessageMethod":    kitex.NewMethodInfo(getAllMessageMethodHandler, newMessageServiceGetAllMessageMethodArgs, newMessageServiceGetAllMessageMethodResult, false),
-		"SendMessageMethod":      kitex.NewMethodInfo(sendMessageMethodHandler, newMessageServiceSendMessageMethodArgs, newMessageServiceSendMessageMethodResult, false),
+		"FollowMethod":          kitex.NewMethodInfo(followMethodHandler, newRelationServiceFollowMethodArgs, newRelationServiceFollowMethodResult, false),
+		"GetFollowInfoMethod":   kitex.NewMethodInfo(getFollowInfoMethodHandler, newRelationServiceGetFollowInfoMethodArgs, newRelationServiceGetFollowInfoMethodResult, false),
+		"GetFollowListMethod":   kitex.NewMethodInfo(getFollowListMethodHandler, newRelationServiceGetFollowListMethodArgs, newRelationServiceGetFollowListMethodResult, false),
+		"GetFollowerListMethod": kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
+		"GetFriendListMethod":   kitex.NewMethodInfo(getFriendListMethodHandler, newRelationServiceGetFriendListMethodArgs, newRelationServiceGetFriendListMethodResult, false),
+		"GetAllMessageMethod":   kitex.NewMethodInfo(getAllMessageMethodHandler, newMessageServiceGetAllMessageMethodArgs, newMessageServiceGetAllMessageMethodResult, false),
+		"SendMessageMethod":     kitex.NewMethodInfo(sendMessageMethodHandler, newMessageServiceSendMessageMethodArgs, newMessageServiceSendMessageMethodResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "relation",
@@ -83,22 +83,22 @@ func newRelationServiceGetFollowInfoMethodResult() interface{} {
 	return relation.NewRelationServiceGetFollowInfoMethodResult()
 }
 
-func getFollowListReqMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
-	realArg := arg.(*relation.RelationServiceGetFollowListReqMethodArgs)
-	realResult := result.(*relation.RelationServiceGetFollowListReqMethodResult)
-	success, err := handler.(relation.RelationService).GetFollowListReqMethod(ctx, realArg.Request)
+func getFollowListMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetFollowListMethodArgs)
+	realResult := result.(*relation.RelationServiceGetFollowListMethodResult)
+	success, err := handler.(relation.RelationService).GetFollowListMethod(ctx, realArg.Request)
 	if err != nil {
 		return err
 	}
 	realResult.Success = success
 	return nil
 }
-func newRelationServiceGetFollowListReqMethodArgs() interface{} {
-	return relation.NewRelationServiceGetFollowListReqMethodArgs()
+func newRelationServiceGetFollowListMethodArgs() interface{} {
+	return relation.NewRelationServiceGetFollowListMethodArgs()
 }
 
-func newRelationServiceGetFollowListReqMethodResult() interface{} {
-	return relation.NewRelationServiceGetFollowListReqMethodResult()
+func newRelationServiceGetFollowListMethodResult() interface{} {
+	return relation.NewRelationServiceGetFollowListMethodResult()
 }
 
 func getFollowerListMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
@@ -203,11 +203,11 @@ func (p *kClient) GetFollowInfoMethod(ctx context.Context, request *relation.Get
 	return _result.GetSuccess(), nil
 }
 
-func (p *kClient) GetFollowListReqMethod(ctx context.Context, request *relation.GetFollowListReq) (r *relation.GetFollowListResp, err error) {
-	var _args relation.RelationServiceGetFollowListReqMethodArgs
+func (p *kClient) GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq) (r *relation.GetFollowListResp, err error) {
+	var _args relation.RelationServiceGetFollowListMethodArgs
 	_args.Request = request
-	var _result relation.RelationServiceGetFollowListReqMethodResult
-	if err = p.c.Call(ctx, "GetFollowListReqMethod", &_args, &_result); err != nil {
+	var _result relation.RelationServiceGetFollowListMethodResult
+	if err = p.c.Call(ctx, "GetFollowListMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil

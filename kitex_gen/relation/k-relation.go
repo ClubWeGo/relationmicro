@@ -5211,7 +5211,7 @@ func (p *RelationServiceGetFollowInfoMethodResult) field0Length() int {
 	return l
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) FastRead(buf []byte) (int, error) {
+func (p *RelationServiceGetFollowListMethodArgs) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -5273,7 +5273,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RelationServiceGetFollowListReqMethodArgs[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RelationServiceGetFollowListMethodArgs[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -5282,7 +5282,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) FastReadField1(buf []byte) (int, error) {
+func (p *RelationServiceGetFollowListMethodArgs) FastReadField1(buf []byte) (int, error) {
 	offset := 0
 
 	tmp := NewGetFollowListReq()
@@ -5296,13 +5296,13 @@ func (p *RelationServiceGetFollowListReqMethodArgs) FastReadField1(buf []byte) (
 }
 
 // for compatibility
-func (p *RelationServiceGetFollowListReqMethodArgs) FastWrite(buf []byte) int {
+func (p *RelationServiceGetFollowListMethodArgs) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RelationServiceGetFollowListMethodArgs) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetFollowListReqMethod_args")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetFollowListMethod_args")
 	if p != nil {
 		offset += p.fastWriteField1(buf[offset:], binaryWriter)
 	}
@@ -5311,9 +5311,9 @@ func (p *RelationServiceGetFollowListReqMethodArgs) FastWriteNocopy(buf []byte, 
 	return offset
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) BLength() int {
+func (p *RelationServiceGetFollowListMethodArgs) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("GetFollowListReqMethod_args")
+	l += bthrift.Binary.StructBeginLength("GetFollowListMethod_args")
 	if p != nil {
 		l += p.field1Length()
 	}
@@ -5322,7 +5322,7 @@ func (p *RelationServiceGetFollowListReqMethodArgs) BLength() int {
 	return l
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RelationServiceGetFollowListMethodArgs) fastWriteField1(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "request", thrift.STRUCT, 1)
 	offset += p.Request.FastWriteNocopy(buf[offset:], binaryWriter)
@@ -5330,7 +5330,7 @@ func (p *RelationServiceGetFollowListReqMethodArgs) fastWriteField1(buf []byte, 
 	return offset
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) field1Length() int {
+func (p *RelationServiceGetFollowListMethodArgs) field1Length() int {
 	l := 0
 	l += bthrift.Binary.FieldBeginLength("request", thrift.STRUCT, 1)
 	l += p.Request.BLength()
@@ -5338,7 +5338,7 @@ func (p *RelationServiceGetFollowListReqMethodArgs) field1Length() int {
 	return l
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) FastRead(buf []byte) (int, error) {
+func (p *RelationServiceGetFollowListMethodResult) FastRead(buf []byte) (int, error) {
 	var err error
 	var offset int
 	var l int
@@ -5400,7 +5400,7 @@ ReadStructBeginError:
 ReadFieldBeginError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d begin error: ", p, fieldId), err)
 ReadFieldError:
-	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RelationServiceGetFollowListReqMethodResult[fieldId]), err)
+	return offset, thrift.PrependError(fmt.Sprintf("%T read field %d '%s' error: ", p, fieldId, fieldIDToName_RelationServiceGetFollowListMethodResult[fieldId]), err)
 SkipFieldError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T field %d skip type %d error: ", p, fieldId, fieldTypeId), err)
 ReadFieldEndError:
@@ -5409,7 +5409,7 @@ ReadStructEndError:
 	return offset, thrift.PrependError(fmt.Sprintf("%T read struct end error: ", p), err)
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) FastReadField0(buf []byte) (int, error) {
+func (p *RelationServiceGetFollowListMethodResult) FastReadField0(buf []byte) (int, error) {
 	offset := 0
 
 	tmp := NewGetFollowListResp()
@@ -5423,13 +5423,13 @@ func (p *RelationServiceGetFollowListReqMethodResult) FastReadField0(buf []byte)
 }
 
 // for compatibility
-func (p *RelationServiceGetFollowListReqMethodResult) FastWrite(buf []byte) int {
+func (p *RelationServiceGetFollowListMethodResult) FastWrite(buf []byte) int {
 	return 0
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RelationServiceGetFollowListMethodResult) FastWriteNocopy(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
-	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetFollowListReqMethod_result")
+	offset += bthrift.Binary.WriteStructBegin(buf[offset:], "GetFollowListMethod_result")
 	if p != nil {
 		offset += p.fastWriteField0(buf[offset:], binaryWriter)
 	}
@@ -5438,9 +5438,9 @@ func (p *RelationServiceGetFollowListReqMethodResult) FastWriteNocopy(buf []byte
 	return offset
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) BLength() int {
+func (p *RelationServiceGetFollowListMethodResult) BLength() int {
 	l := 0
-	l += bthrift.Binary.StructBeginLength("GetFollowListReqMethod_result")
+	l += bthrift.Binary.StructBeginLength("GetFollowListMethod_result")
 	if p != nil {
 		l += p.field0Length()
 	}
@@ -5449,7 +5449,7 @@ func (p *RelationServiceGetFollowListReqMethodResult) BLength() int {
 	return l
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
+func (p *RelationServiceGetFollowListMethodResult) fastWriteField0(buf []byte, binaryWriter bthrift.BinaryWriter) int {
 	offset := 0
 	if p.IsSetSuccess() {
 		offset += bthrift.Binary.WriteFieldBegin(buf[offset:], "success", thrift.STRUCT, 0)
@@ -5459,7 +5459,7 @@ func (p *RelationServiceGetFollowListReqMethodResult) fastWriteField0(buf []byte
 	return offset
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) field0Length() int {
+func (p *RelationServiceGetFollowListMethodResult) field0Length() int {
 	l := 0
 	if p.IsSetSuccess() {
 		l += bthrift.Binary.FieldBeginLength("success", thrift.STRUCT, 0)
@@ -6517,11 +6517,11 @@ func (p *RelationServiceGetFollowInfoMethodResult) GetResult() interface{} {
 	return p.Success
 }
 
-func (p *RelationServiceGetFollowListReqMethodArgs) GetFirstArgument() interface{} {
+func (p *RelationServiceGetFollowListMethodArgs) GetFirstArgument() interface{} {
 	return p.Request
 }
 
-func (p *RelationServiceGetFollowListReqMethodResult) GetResult() interface{} {
+func (p *RelationServiceGetFollowListMethodResult) GetResult() interface{} {
 	return p.Success
 }
 
