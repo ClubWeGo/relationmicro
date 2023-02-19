@@ -9,6 +9,7 @@ import (
 	"github.com/cloudwego/kitex/pkg/rpcinfo"
 	"github.com/cloudwego/kitex/server"
 	etcd "github.com/kitex-contrib/registry-etcd"
+	kitexServer "github.com/ClubWeGo/relationmicro/kitex_server"
 )
 
 func main() {
@@ -26,8 +27,15 @@ func main() {
 
 	r, err := etcd.NewEtcdRegistry([]string{"0.0.0.0:2379"})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalf("etcd registry err:%s", err)
 	}
+
+	resolver, err := etcd.NewEtcdResolver([]string{"0.0.0.0:2379"})
+	if err != nil {
+		log.Fatalf("etcd resolver err:%s", err)
+	}
+
+	kitexServer.Init(resolver)
 
 	addr, _ := net.ResolveTCPAddr("tcp", "0.0.0.0:10002")
 	svr := relationmicro.NewServer(new(CombineServiceImpl),

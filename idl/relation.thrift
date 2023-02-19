@@ -7,16 +7,17 @@ namespace go relation
     "is_follow": true
 **/
 struct User {
-    // 用户ID
-    1: required i64 id;
-    // 用户昵称
-    2: required string name;
-    // 用户关注数
-    3: required i64 follow_count;
-    // 用户粉丝数
-    4: required i64 follower_count;
-    // 是否关注 true-已关注 false-未关注
-    5: required bool is_follow;
+    1:  required i64        id;
+    2:  required string     name;               // 用户昵称
+    3:  optional i64        follow_count;       // 关注数
+    4:  optional i64        follower_count;     // 粉丝数
+    5:  required bool       is_follow;          // 是否关注 true-已关注 false-未关注
+    6:  optional string     avatar;             // 头像
+    7:  optional string     background_image;   // 个人顶部大图
+    8:  optional string     signature;          // 个人简介
+    9:  optional i64        total_favorited;    // 获赞数
+    10: optional i64        work_count;         // 作品数
+    11: optional i64        favorite_count;     // 喜欢数
 }
 
 struct FollowInfo {
@@ -29,15 +30,15 @@ struct FollowInfo {
 struct FriendInfo {
     1:  required i64        id;
     2:  required string     name;               // 昵称
-    3:  required i64        follow_count;       // 关注数
-    4:  required i64        follower_count;     // 粉丝数
+    3:  optional i64        follow_count;       // 关注数
+    4:  optional i64        follower_count;     // 粉丝数
     5:  required bool       is_follow;          // 是否关注
-    6:  required string     avatar;             // 用户头像url
-    7:  required string     background_image;   // 用户个人页顶部大图url
-    8:  required string     signature;          // 个人简介
-    9:  required i64        total_favorited;    // 获赞数量
-    10: required i64        work_count;         // 作品数
-    11: required i64        favorite_count;     // 喜欢数
+    6:  optional string     avatar;             // 用户头像url
+    7:  optional string     background_image;   // 用户个人页顶部大图url
+    8:  optional string     signature;          // 个人简介
+    9:  optional i64        total_favorited;    // 获赞数量
+    10: optional i64        work_count;         // 作品数
+    11: optional i64        favorite_count;     // 喜欢数
 }
 
 // 关注

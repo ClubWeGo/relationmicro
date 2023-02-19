@@ -53,13 +53,19 @@ func (s *CombineServiceImpl) GetFollowerListMethod(ctx context.Context, request 
 	// 封装响应
 	respUserList := make([]*relation.User, len(followerList))
 	for i, followerUser := range followerList {
-		fmt.Println("&" , followerUser.Name)
+		fmt.Println("&", followerUser.Name)
 		respUserList[i] = &relation.User{
-			Id:            followerUser.Id,
-			Name:          followerUser.Name,
-			FollowCount:   followerUser.FollowCount,
-			FollowerCount: followerUser.FollowerCount,
-			IsFollow:      followerUser.IsFollow,
+			Id:              followerUser.Id,
+			Name:            followerUser.Name,
+			FollowCount:     followerUser.FollowCount,
+			FollowerCount:   followerUser.FollowerCount,
+			IsFollow:        followerUser.IsFollow,
+			Avatar:          followerUser.Avatar,
+			BackgroundImage: followerUser.BackgroundImage,
+			Signature:       followerUser.Signature,
+			TotalFavorited:  followerUser.TotalFavorited,
+			WorkCount:       followerUser.WorkCount,
+			FavoriteCount:   followerUser.FavoriteCount,
 		}
 	}
 	return &relation.GetFollowerListResp{
@@ -185,6 +191,7 @@ func VerifyFollowParam(myUid int64, targetUid int64) *string {
 
 // 校验查询关注信息的非法请求参数
 func VerifyFindFollowParam(myUid *int64, targetUid int64) *string {
+	fmt.Println("VerifyFindFollowParam")
 	return nil
 }
 
@@ -196,6 +203,7 @@ func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *r
 
 // GetFollowListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq) (resp *relation.GetFollowListResp, err error) {
+	fmt.Println("GetFollowListMethod start")
 	myId := request.MyId
 	targetId := request.TargetId
 	// 参数校验
@@ -221,13 +229,20 @@ func (s *CombineServiceImpl) GetFollowListMethod(ctx context.Context, request *r
 	for i, followUser := range followList {
 		fmt.Println(followUser)
 		respUserList[i] = &relation.User{
-			Id:            followUser.Id,
-			Name:          followUser.Name,
-			FollowCount:   followUser.FollowCount,
-			FollowerCount: followUser.FollowerCount,
-			IsFollow:      followUser.IsFollow,
+			Id:              followUser.Id,
+			Name:            followUser.Name,
+			FollowCount:     followUser.FollowCount,
+			FollowerCount:   followUser.FollowerCount,
+			IsFollow:        followUser.IsFollow,
+			Avatar:          followUser.Avatar,
+			BackgroundImage: followUser.BackgroundImage,
+			Signature:       followUser.Signature,
+			TotalFavorited:  followUser.TotalFavorited,
+			WorkCount:       followUser.WorkCount,
+			FavoriteCount:   followUser.FavoriteCount,
 		}
 	}
+	fmt.Println("GetFollowListMethod end")
 	return &relation.GetFollowListResp{
 		StatusCode: SUCCESS,
 		UserList:   respUserList,

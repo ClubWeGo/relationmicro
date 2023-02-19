@@ -5,6 +5,7 @@ import (
 	"log"
 	"strconv"
 
+	kitexServer "github.com/ClubWeGo/relationmicro/kitex_server"
 	redisUtil "github.com/ClubWeGo/relationmicro/util"
 )
 
@@ -32,11 +33,17 @@ type FollowList struct {
 }
 
 type FollowUser struct {
-	Id            int64
-	Name          string // 昵称
-	FollowCount   int64  // 关注数
-	FollowerCount int64  // 粉丝数
-	IsFollow      bool   // 是否关注 true-已关注 false-未关注
+	Id              int64
+	Name            string  // 用户昵称
+	FollowCount     *int64  // 关注数
+	FollowerCount   *int64  // 粉丝数
+	IsFollow        bool    // 是否关注 true-已关注 false-未关注
+	Avatar          *string // 头像
+	BackgroundImage *string // 个人顶部大图
+	Signature       *string // 个人简介
+	TotalFavorited  *int64  // 获赞数
+	WorkCount       *int64  // 作品数
+	FavoriteCount   *int64  // 喜欢数
 }
 
 func Init(config redisUtil.Config) {
@@ -106,6 +113,7 @@ myUid: 我的userId
 targetUid: 查询目标userId
 */
 func FindFollowList(myUid int64, targetUid int64) ([]FollowUser, error) {
+	//log.Println("FindFollowList start")
 	var followList = make([]FollowUser, 0)
 
 	key := redisUtil.GetFollowKey(targetUid)
@@ -116,24 +124,19 @@ func FindFollowList(myUid int64, targetUid int64) ([]FollowUser, error) {
 	}
 
 	// []int64 的followUserId 为填入昵称作预备
-	var followUserIds = make([]int64, 0, 0)
+	var followUserIds = make([]int64, len(res))
 	// []followUserId (string) -> followList 封装
-	for _, val := range res {
+	for i, val := range res {
 		// target 的 关注者 userId
 		followUserId, err := strconv.ParseInt(val, 10, 64)
-		followUserIds = append(followUserIds, followUserId)
 		if err != nil {
 			log.Printf("FindFollowList: mUid:%d, targetUid:%d, parseInt exception:%s", myUid, targetUid, err)
 			continue
-		} else {
-			// 查询target关注者的 其他信息&我与target关注者的关系
-			followUser := FindFollowOther(myUid, followUserId)
-			followList = append(followList, followUser)
 		}
+		followUserIds[i] = followUserId
 	}
-	// 去缓存拿到用户名集合并填入
-	SetFollowNameByUserIds(followList, followUserIds)
-	return followList, nil
+	// 通过kitex 用户服务查询用户详细信息
+	return FindFollowUserDetailBySet(followUserIds)
 }
 
 /**
@@ -179,14 +182,29 @@ func SetFollowNameByUserIds(followList []FollowUser, followUserIds []int64) {
 查询关注用户的其他信息
 */
 func FindFollowOther(myId int64, followUserId int64) FollowUser {
+	fmt.Println("FindFollowOther")
 	var followUser = FollowUser{Id: followUserId, Name: redisUtil.USER_DEFAULT_NAME}
 	// todo 查询用户名
-	followUser.FollowCount = FindFollowCount(followUserId)
-	followUser.FollowerCount = FindFollowerCount(followUserId)
+	followCount := FindFollowCount(followUserId)
+	followerCount := FindFollowerCount(followUserId)
+	followUser.FollowCount = &followCount
+	followUser.FollowerCount = &followerCount
 	followUser.IsFollow = FindIsFollow(myId, followUserId)
+	userInfo, err := kitexServer.GetUserInfo(followUserId)
+	if err != nil {
+		log.Printf("FindFollowOther error, myId:%d, followUserId:%d, err:%s", myId, followUserId, err)
+		return followUser
+	}
+	// rpc 请求
+	followUser.Name = userInfo.Name
+	followUser.Avatar = userInfo.Avatar
+	followUser.BackgroundImage = userInfo.BackgroundImage
+	followUser.Signature = userInfo.Signature
+	followUser.TotalFavorited = userInfo.TotalFavorited
+	followUser.WorkCount = userInfo.WorkCount
+	followUser.FavoriteCount = userInfo.FavoriteCount
 	return followUser
 }
-
 /*
 *
 查询用户的关注数
