@@ -40,7 +40,7 @@ func main() {
 	//	log.Println(err)
 	//}
 	//fmt.Println("无参followList")
-	//for _, user := range followList.GetUserList() {
+	//for _, user := range followt.GetUserList() {
 	//	fmt.Println(user)
 	//}
 
@@ -71,7 +71,17 @@ func main() {
 		fmt.Println(user)
 	}
 
-	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 7777, ActionType: 1})
-	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 20027, ActionType: 2})
+
+
+	*myUid = 1
+	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 3, ActionType: 1})
+	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 2, ActionType: 1})
+
+	friendList, err := client.GetFriendListMethod(context.Background(), &relation.GetFriendListReq{MyUid: myUid, TargetUid: 2009})
+
+	for _, friend := range friendList.GetFriendList() {
+		fmt.Println(friend)
+	}
+
 
 }
