@@ -191,13 +191,52 @@ func VerifyFollowParam(myUid int64, targetUid int64) *string {
 
 // 校验查询关注信息的非法请求参数
 func VerifyFindFollowParam(myUid *int64, targetUid int64) *string {
-	fmt.Println("VerifyFindFollowParam")
 	return nil
 }
 
 // GetFriendListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq) (resp *relation.GetFriendListResp, err error) {
-	// TODO: Your code here...
+	myId := request.MyUid
+	targetId := request.TargetUid
+	// 参数校验
+	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
+		return &relation.GetFriendListResp{
+			StatusCode: VERIFY,
+			FriendList: []*relation.FriendInfo{},
+			Msg:        verifyMsg,
+		}, nil
+	}
+	// myId 为空 isFollow全为false 无影响
+	followerList, err := service.FindFollowerList(*myId, targetId)
+	if err != nil {
+		return &relation.GetFriendListResp{
+			StatusCode: ERROR,
+			FriendList: []*relation.FriendInfo{},
+		}, err
+	}
+	// 封装响应
+	respUserList := make([]*relation.FriendInfo, len(followerList))
+	for i, followerUser := range followerList {
+		fmt.Println("&", followerUser.Name)
+		respUserList[i] = &relation.FriendInfo{
+			Id:              followerUser.Id,
+			Name:            followerUser.Name,
+			FollowCount:     followerUser.FollowCount,
+			FollowerCount:   followerUser.FollowerCount,
+			IsFollow:        followerUser.IsFollow,
+			Avatar:          followerUser.Avatar,
+			BackgroundImage: followerUser.BackgroundImage,
+			Signature:       followerUser.Signature,
+			TotalFavorited:  followerUser.TotalFavorited,
+			WorkCount:       followerUser.WorkCount,
+			FavoriteCount:   followerUser.FavoriteCount,
+		}
+	}
+	return &relation.GetFriendListResp{
+		StatusCode: SUCCESS,
+		FriendList: respUserList,
+	}, nil
+
 	return
 }
 
