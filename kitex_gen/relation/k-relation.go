@@ -3677,9 +3677,9 @@ func (p *GetFriendListResp) FastReadField2(buf []byte) (int, error) {
 	if err != nil {
 		return offset, err
 	}
-	p.FriendList = make([]*FriendInfo, 0, size)
+	p.FriendList = make([]*User, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := NewFriendInfo()
+		_elem := NewUser()
 		if l, err := _elem.FastRead(buf[offset:]); err != nil {
 			return offset, err
 		} else {

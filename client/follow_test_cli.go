@@ -77,8 +77,9 @@ func main() {
 	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 3, ActionType: 1})
 	client.FollowMethod(context.Background(), &relation.FollowReq{MyUid: *myUid, TargetUid: 2, ActionType: 1})
 
-	friendList, err := client.GetFriendListMethod(context.Background(), &relation.GetFriendListReq{MyUid: myUid, TargetUid: 2009})
+	friendList, err := client.GetFriendListMethod(context.Background(), &relation.GetFriendListReq{MyUid: myUid, TargetUid: 2})
 
+	fmt.Println("有参friendList")
 	for _, friend := range friendList.GetFriendList() {
 		fmt.Println(friend)
 	}

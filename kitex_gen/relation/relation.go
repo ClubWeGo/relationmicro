@@ -4653,9 +4653,9 @@ func (p *GetFriendListReq) Field2DeepEqual(src int64) bool {
 }
 
 type GetFriendListResp struct {
-	StatusCode int32         `thrift:"status_code,1,required" frugal:"1,required,i32" json:"status_code"`
-	FriendList []*FriendInfo `thrift:"friend_list,2,optional" frugal:"2,optional,list<FriendInfo>" json:"friend_list,omitempty"`
-	Msg        *string       `thrift:"msg,3,optional" frugal:"3,optional,string" json:"msg,omitempty"`
+	StatusCode int32   `thrift:"status_code,1,required" frugal:"1,required,i32" json:"status_code"`
+	FriendList []*User `thrift:"friend_list,2,optional" frugal:"2,optional,list<User>" json:"friend_list,omitempty"`
+	Msg        *string `thrift:"msg,3,optional" frugal:"3,optional,string" json:"msg,omitempty"`
 }
 
 func NewGetFriendListResp() *GetFriendListResp {
@@ -4670,9 +4670,9 @@ func (p *GetFriendListResp) GetStatusCode() (v int32) {
 	return p.StatusCode
 }
 
-var GetFriendListResp_FriendList_DEFAULT []*FriendInfo
+var GetFriendListResp_FriendList_DEFAULT []*User
 
-func (p *GetFriendListResp) GetFriendList() (v []*FriendInfo) {
+func (p *GetFriendListResp) GetFriendList() (v []*User) {
 	if !p.IsSetFriendList() {
 		return GetFriendListResp_FriendList_DEFAULT
 	}
@@ -4690,7 +4690,7 @@ func (p *GetFriendListResp) GetMsg() (v string) {
 func (p *GetFriendListResp) SetStatusCode(val int32) {
 	p.StatusCode = val
 }
-func (p *GetFriendListResp) SetFriendList(val []*FriendInfo) {
+func (p *GetFriendListResp) SetFriendList(val []*User) {
 	p.FriendList = val
 }
 func (p *GetFriendListResp) SetMsg(val *string) {
@@ -4812,9 +4812,9 @@ func (p *GetFriendListResp) ReadField2(iprot thrift.TProtocol) error {
 	if err != nil {
 		return err
 	}
-	p.FriendList = make([]*FriendInfo, 0, size)
+	p.FriendList = make([]*User, 0, size)
 	for i := 0; i < size; i++ {
-		_elem := NewFriendInfo()
+		_elem := NewUser()
 		if err := _elem.Read(iprot); err != nil {
 			return err
 		}
@@ -4968,7 +4968,7 @@ func (p *GetFriendListResp) Field1DeepEqual(src int32) bool {
 	}
 	return true
 }
-func (p *GetFriendListResp) Field2DeepEqual(src []*FriendInfo) bool {
+func (p *GetFriendListResp) Field2DeepEqual(src []*User) bool {
 
 	if len(p.FriendList) != len(src) {
 		return false

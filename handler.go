@@ -202,7 +202,7 @@ func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *r
 	if verifyMsg := VerifyFindFollowParam(myId, targetId); verifyMsg != nil {
 		return &relation.GetFriendListResp{
 			StatusCode: VERIFY,
-			FriendList: []*relation.FriendInfo{},
+			FriendList: []*relation.User{},
 			Msg:        verifyMsg,
 		}, nil
 	}
@@ -211,14 +211,14 @@ func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *r
 	if err != nil {
 		return &relation.GetFriendListResp{
 			StatusCode: ERROR,
-			FriendList: []*relation.FriendInfo{},
+			FriendList: []*relation.User{},
 		}, err
 	}
 	// 封装响应
-	respUserList := make([]*relation.FriendInfo, len(followerList))
+	respUserList := make([]*relation.User, len(followerList))
 	for i, followerUser := range followerList {
 		fmt.Println("&", followerUser.Name)
-		respUserList[i] = &relation.FriendInfo{
+		respUserList[i] = &relation.User{
 			Id:              followerUser.Id,
 			Name:            followerUser.Name,
 			FollowCount:     followerUser.FollowCount,
