@@ -102,7 +102,7 @@ struct GetFriendListReq {
 
 struct GetFriendListResp {
     1: required i32 status_code;
-    2: optional list<FriendInfo> friend_list;
+    2: optional list<User> friend_list; // 好友列表
     3: optional string msg;
 }
 
