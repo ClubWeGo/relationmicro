@@ -113,7 +113,7 @@ myUid: 我的userId
 targetUid: 查询目标userId
 */
 func FindFollowList(myUid int64, targetUid int64) ([]FollowUser, error) {
-	//log.Println("FindFollowList start")
+	log.Println("FindFollowList start")
 	var followList = make([]FollowUser, 0)
 
 	key := redisUtil.GetFollowKey(targetUid)
