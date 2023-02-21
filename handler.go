@@ -288,3 +288,28 @@ func (s *CombineServiceImpl) GetFollowListMethod(ctx context.Context, request *r
 	}, err
 
 }
+
+// GetIsFollowsMethod implements the RelationServiceImpl interface.
+func (s *CombineServiceImpl) GetIsFollowsMethod(ctx context.Context, request *relation.GetIsFollowsReq) (resp *relation.GetIsFollowsResp, err error) {
+	// TODO: Your code here...
+	isFollows, err := service.FindIsFollows(request.GetMyUid(), request.GetUserIds())
+	if err != nil {
+		return &relation.GetIsFollowsResp{
+			StatusCode: ERROR,
+			IsFollowMap: nil,
+		}, nil
+	}
+
+	isFollowMap := make(map[int64]bool)
+	for userId, isFollow := range isFollows {
+		if isFollow == 1 {
+			isFollowMap[userId] = true
+		} else {
+			isFollowMap[userId] = false
+		}
+	}
+	return &relation.GetIsFollowsResp{
+		StatusCode: SUCCESS,
+		IsFollowMap: isFollowMap,
+	}, nil
+}

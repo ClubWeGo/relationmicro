@@ -85,4 +85,12 @@ func main() {
 	}
 
 
+	userIds := []int64{2009, 7777, 8888}
+	resp, err := client.GetIsFollowsMethod(context.Background(), &relation.GetIsFollowsReq{MyUid: 2006, UserIds: userIds})
+
+	fmt.Println("GetIsFollowMap")
+	for k, v := range resp.GetIsFollowMap() {
+		fmt.Println(k, v)
+	}
+
 }
