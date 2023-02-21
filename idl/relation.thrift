@@ -106,6 +106,17 @@ struct GetFriendListResp {
     3: optional string msg;
 }
 
+struct GetIsFollowsReq{
+    1: required i64         myUid;      // 发出请求的userId
+    2: required list<i64>   userIds;    // 查询目标用户集合
+}
+
+struct GetIsFollowsResp{
+    1: required i32                 status_code;
+    2: optional map<i64, bool>      is_follow_map;    // userId - isFollow
+    3: optional string              msg;
+}
+
 service RelationService {
     // 关注
     FollowResp FollowMethod(1: FollowReq request)
@@ -117,6 +128,8 @@ service RelationService {
     GetFollowerListResp GetFollowerListMethod(1: GetFollowerListReq request)
     // 获取好友列表
     GetFriendListResp GetFriendListMethod(1: GetFriendListReq request)
+    // 根据userIds 获取 各用户关注状态
+    GetIsFollowsResp GetIsFollowsMethod(1: GetIsFollowsReq request)
 }
 
 // message

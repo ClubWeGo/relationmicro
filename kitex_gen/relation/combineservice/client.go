@@ -16,6 +16,7 @@ type Client interface {
 	GetFollowListMethod(ctx context.Context, request *relation.GetFollowListReq, callOptions ...callopt.Option) (r *relation.GetFollowListResp, err error)
 	GetFollowerListMethod(ctx context.Context, request *relation.GetFollowerListReq, callOptions ...callopt.Option) (r *relation.GetFollowerListResp, err error)
 	GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error)
+	GetIsFollowsMethod(ctx context.Context, request *relation.GetIsFollowsReq, callOptions ...callopt.Option) (r *relation.GetIsFollowsResp, err error)
 	GetAllMessageMethod(ctx context.Context, request *relation.GetAllMessageReq, callOptions ...callopt.Option) (r *relation.GetAllMessageResp, err error)
 	SendMessageMethod(ctx context.Context, request *relation.SendMessageReq, callOptions ...callopt.Option) (r *relation.SendMessageResp, err error)
 }
@@ -72,6 +73,11 @@ func (p *kCombineServiceClient) GetFollowerListMethod(ctx context.Context, reque
 func (p *kCombineServiceClient) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq, callOptions ...callopt.Option) (r *relation.GetFriendListResp, err error) {
 	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
 	return p.kClient.GetFriendListMethod(ctx, request)
+}
+
+func (p *kCombineServiceClient) GetIsFollowsMethod(ctx context.Context, request *relation.GetIsFollowsReq, callOptions ...callopt.Option) (r *relation.GetIsFollowsResp, err error) {
+	ctx = client.NewCtxWithCallOptions(ctx, callOptions)
+	return p.kClient.GetIsFollowsMethod(ctx, request)
 }
 
 func (p *kCombineServiceClient) GetAllMessageMethod(ctx context.Context, request *relation.GetAllMessageReq, callOptions ...callopt.Option) (r *relation.GetAllMessageResp, err error) {
