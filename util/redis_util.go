@@ -377,6 +377,14 @@ func Eval(script string, keyNumber int, keyArgvs ...interface{}) (interface{}, e
 
 /*
 *
+lua 返回 ints
+*/
+func EvalReturnInts(script string, keyNumber int, keyArgvs ...interface{}) ([]int, error) {
+	return redis.Ints(Eval(script, keyNumber, keyArgvs...))
+}
+
+/*
+*
 根据 lua sha1 直接执行缓存的lua脚本
 */
 func EvalSha(luaSha1 string, keyNumber int, keyArgvs ...interface{}) (interface{}, error) {

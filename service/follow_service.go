@@ -205,6 +205,7 @@ func FindFollowOther(myId int64, followUserId int64) FollowUser {
 	followUser.FavoriteCount = userInfo.FavoriteCount
 	return followUser
 }
+
 /*
 *
 查询用户的关注数
@@ -254,4 +255,29 @@ func CheckUserId(userId int64) error {
 		return nil
 	}
 	return fmt.Errorf("userId:%d out of range", userId)
+}
+
+// 根据userIds 批量查询多个用户的关注状态
+func FindIsFollows(myUid int64, userIds []int64) (map[int64]int, error) {
+	followKey := redisUtil.GetFollowKey(myUid)
+	script := redisUtil.GetIsFollowsScript()
+	keyArgvs := make([]interface{}, len(userIds)+1)
+	keyArgvs[0] = followKey
+	for i, id := range userIds {
+		keyArgvs[i+1] = id
+	}
+
+	isFollows, err := redisUtil.EvalReturnInts(script, 1, keyArgvs...)
+	if err != nil {
+		return nil, fmt.Errorf("FindIsFollows lua eval error, myUid:%d, err:%s", myUid, err)
+	}
+	if len(userIds) != len(isFollows) {
+		return nil, fmt.Errorf("FindIsFollows redis 返回 长度不一致, myUid:%d", myUid)
+	}
+	resMap := make(map[int64]int)
+	for i, id := range userIds {
+		resMap[id] = isFollows[i]
+	}
+
+	return resMap, nil
 }

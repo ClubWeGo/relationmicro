@@ -73,6 +73,17 @@ func TestFindNoneFollow(t *testing.T) {
 	fmt.Println(isFollow)
 }
 
+func TestFindIsFollows(t *testing.T) {
+	userIds := []int64{2009, 20027}
+	isFollowMap, err := FindIsFollows(2006 , userIds)
+	if err != nil {
+		t.Error(err)
+	}
+	for k, v := range isFollowMap {
+		fmt.Println(k, v)
+	}
+}
+
 func TestMain(m *testing.M) {
 	config := redisUtil.Config{
 		Url:         "localhost:6379",

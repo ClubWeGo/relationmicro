@@ -13,8 +13,9 @@ const (
 )
 
 type LuaScripts struct {
-	Follow   string
-	UnFollow string
+	Follow    string
+	UnFollow  string
+	IsFollows string // 多个用户的关注状态
 }
 
 var luaScripts LuaScripts
@@ -35,6 +36,17 @@ redis.call('zrem', KEYS[1], ARGV[1]);
 redis.call('zrem', KEYS[2], ARGV[2]);
 return 1;
 `
+	isFollows := `
+local isFollows = {}
+for i=1, #ARGV
+	do
+	local isFollow = redis.call('zrank', KEYS[1], ARGV[i])
+	if type(isFollow) == 'number'	then isFollows[i] = 1
+	else isFollows[i] = 0
+	end
+end
+return isFollows
+`
 
 	// todo golang test run build相对路径不一样 目前没找到通用方法
 	//rootPath, err := GetRootPath()
@@ -52,6 +64,7 @@ return 1;
 	//}
 	luaScripts.Follow = followScript
 	luaScripts.UnFollow = unFollowScript
+	luaScripts.IsFollows = isFollows
 }
 
 /*
@@ -68,6 +81,10 @@ unFollow lua script
 */
 func GetUnFollowScript() string {
 	return luaScripts.UnFollow
+}
+
+func GetIsFollowsScript() string {
+	return luaScripts.IsFollows
 }
 
 func ReadAll(fileName string) (string, error) {

@@ -24,6 +24,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"GetFollowListMethod":   kitex.NewMethodInfo(getFollowListMethodHandler, newRelationServiceGetFollowListMethodArgs, newRelationServiceGetFollowListMethodResult, false),
 		"GetFollowerListMethod": kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
 		"GetFriendListMethod":   kitex.NewMethodInfo(getFriendListMethodHandler, newRelationServiceGetFriendListMethodArgs, newRelationServiceGetFriendListMethodResult, false),
+		"GetIsFollowsMethod":    kitex.NewMethodInfo(getIsFollowsMethodHandler, newRelationServiceGetIsFollowsMethodArgs, newRelationServiceGetIsFollowsMethodResult, false),
 	}
 	extra := map[string]interface{}{
 		"PackageName": "relation",
@@ -129,6 +130,24 @@ func newRelationServiceGetFriendListMethodResult() interface{} {
 	return relation.NewRelationServiceGetFriendListMethodResult()
 }
 
+func getIsFollowsMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetIsFollowsMethodArgs)
+	realResult := result.(*relation.RelationServiceGetIsFollowsMethodResult)
+	success, err := handler.(relation.RelationService).GetIsFollowsMethod(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newRelationServiceGetIsFollowsMethodArgs() interface{} {
+	return relation.NewRelationServiceGetIsFollowsMethodArgs()
+}
+
+func newRelationServiceGetIsFollowsMethodResult() interface{} {
+	return relation.NewRelationServiceGetIsFollowsMethodResult()
+}
+
 type kClient struct {
 	c client.Client
 }
@@ -184,6 +203,16 @@ func (p *kClient) GetFriendListMethod(ctx context.Context, request *relation.Get
 	_args.Request = request
 	var _result relation.RelationServiceGetFriendListMethodResult
 	if err = p.c.Call(ctx, "GetFriendListMethod", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetIsFollowsMethod(ctx context.Context, request *relation.GetIsFollowsReq) (r *relation.GetIsFollowsResp, err error) {
+	var _args relation.RelationServiceGetIsFollowsMethodArgs
+	_args.Request = request
+	var _result relation.RelationServiceGetIsFollowsMethodResult
+	if err = p.c.Call(ctx, "GetIsFollowsMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
