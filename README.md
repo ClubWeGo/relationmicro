@@ -75,13 +75,17 @@
 2. redis
 3. usermicro `不启动user服务也能正常跑起来, 但查询列表等功能需要查询user服务，没有user服务会查询失败`
    - 引用usermicro服务`go get github.com/ClubWeGo/usermicro@latest`
-   
 上述配置均能再main方法里找到
 
 
 
 # 其他
 idl 我们使用的kitex+thrift
+
+如需要加入新的rpc接口, 需通过编写thrift文件和kitex命令自动生成相关代码
+
+[kitex官方文档](https://www.cloudwego.io/zh/docs/kitex/)
+
 
 聚合message的方法到relation的生成代码中的方案
 https://www.cloudwego.io/zh/docs/kitex/tutorials/code-gen/combine_service/
