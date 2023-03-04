@@ -196,6 +196,7 @@ func VerifyFindFollowParam(myUid *int64, targetUid int64) *string {
 
 // GetFriendListMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *relation.GetFriendListReq) (resp *relation.GetFriendListResp, err error) {
+	log.Println("GetFriendListMethod start")
 	myId := request.MyUid
 	targetId := request.TargetUid
 	// 参数校验
@@ -208,6 +209,7 @@ func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *r
 	}
 	// myId 为空 isFollow全为false 无影响
 	followerList, err := service.FindFollowerList(*myId, targetId)
+	log.Println("GetFriendListMethod service 请求完成")
 	if err != nil {
 		return &relation.GetFriendListResp{
 			StatusCode: ERROR,
@@ -232,6 +234,7 @@ func (s *CombineServiceImpl) GetFriendListMethod(ctx context.Context, request *r
 			FavoriteCount:   followerUser.FavoriteCount,
 		}
 	}
+	log.Println("GetFriendListMethod 响应封装end")
 	return &relation.GetFriendListResp{
 		StatusCode: SUCCESS,
 		FriendList: respUserList,
@@ -291,11 +294,10 @@ func (s *CombineServiceImpl) GetFollowListMethod(ctx context.Context, request *r
 
 // GetIsFollowsMethod implements the RelationServiceImpl interface.
 func (s *CombineServiceImpl) GetIsFollowsMethod(ctx context.Context, request *relation.GetIsFollowsReq) (resp *relation.GetIsFollowsResp, err error) {
-	// TODO: Your code here...
 	isFollows, err := service.FindIsFollows(request.GetMyUid(), request.GetUserIds())
 	if err != nil {
 		return &relation.GetIsFollowsResp{
-			StatusCode: ERROR,
+			StatusCode:  ERROR,
 			IsFollowMap: nil,
 		}, nil
 	}
@@ -309,7 +311,29 @@ func (s *CombineServiceImpl) GetIsFollowsMethod(ctx context.Context, request *re
 		}
 	}
 	return &relation.GetIsFollowsResp{
-		StatusCode: SUCCESS,
+		StatusCode:  SUCCESS,
 		IsFollowMap: isFollowMap,
+	}, nil
+}
+
+// 根据userIds 获取关注相关信息
+// GetFollowInfosMethod implements the RelationServiceImpl interface.
+func (s *CombineServiceImpl) GetFollowInfosMethod(ctx context.Context, request *relation.GetFollowInfosReq) (resp *relation.GetFollowInfosResp, err error) {
+	myUid := request.GetMyUid()
+	userIds := request.GetUserIds()
+	// todo 参数校验
+
+	followInfos, err := service.FindFollowInfos(myUid, userIds)
+	// 请求异常
+	if err != nil {
+		return &relation.GetFollowInfosResp{
+			StatusCode:     ERROR,
+			FollowInfoList: nil,
+		}, err
+	}
+
+	return &relation.GetFollowInfosResp{
+		StatusCode:     SUCCESS,
+		FollowInfoList: followInfos,
 	}, nil
 }

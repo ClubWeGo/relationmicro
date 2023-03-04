@@ -2,6 +2,7 @@ package util
 
 import (
 	"fmt"
+	"github.com/ClubWeGo/relationmicro/kitex_gen/relation"
 	"log"
 	"time"
 
@@ -70,6 +71,10 @@ func Init(config Config) {
 
 	log.Println("redis pool init success")
 
+}
+
+func GetConn() redis.Conn {
+	return pool.Get()
 }
 
 func Close() {
@@ -437,4 +442,81 @@ func EvalOptimize(script string, keyNumber int, keyArgvs ...interface{}) (interf
 		}
 	}
 	return EvalSha(sha1, keyNumber, keyArgvs...)
+}
+
+func GetFollowInfos(myUid int64, userIds []int64) ([]*relation.FollowInfo, error) {
+	followInfos := make([]*relation.FollowInfo, len(userIds))
+
+	conn := pool.Get()
+	defer conn.Close()
+	// 关注数
+	// 粉丝数
+	// 是否关注
+	for _, userId := range userIds {
+		myFollowKey := GetFollowKey(myUid)
+		followKey := GetFollowKey(userId)
+		followerKey := GetFollowerKey(userId)
+		// 关注数
+		if err := conn.Send("zcard", followKey); err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline send zcard exception, myUid:%d, key:%s err:%s", myUid, followKey, err)
+		}
+		// 粉丝数
+		if err := conn.Send("zcard", followerKey); err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline send zcard exception, myUid:%d, key:%s err:%s", myUid, followerKey, err)
+		}
+		// 是否关注, 是否存在我的关注集合中
+		if err := conn.Send("zrank", myFollowKey, userId); err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline send zrank exception, myUid:%d, key:%s, err:%s", myUid, myFollowKey, err)
+		}
+	}
+	if err := conn.Flush(); err != nil {
+		return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline flush exception, myUid:%d, err:%s", myUid, err)
+	}
+
+	for i, _ := range userIds {
+		// 三个命令, 需要接收三次
+		// 关注数
+		followCount, err := redis.Int64(conn.Receive())
+		if err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline receive followCount exception, myUid:%d, err:%s", myUid, err)
+		}
+		//fmt.Println(reply)
+
+		// 粉丝数
+		followerCount, err := redis.Int64(conn.Receive())
+		if err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline receive followerCount exception, myUid:%d, err:%s", myUid, err)
+		}
+		//fmt.Println(reply)
+
+		// 是否关注
+		reply, err := conn.Receive()
+		if err != nil {
+			return []*relation.FollowInfo{}, fmt.Errorf("GetFollowInfos redis pipeline receive isFollow exception, myUid:%d, err:%s", myUid, err)
+		}
+		// 是否关注 转换为 bool
+		isFollow, err := redis.Bool(reply, err)
+		if err != nil {
+			log.Printf("GetFollowInfos isFollow interface -> bool castTypeException, myUid:%d, err:%s", myUid, err)
+		}
+		//fmt.Println(reply)
+		followInfos[i] = &relation.FollowInfo{
+			FollowCount:   followCount,
+			FollowerCount: followerCount,
+			IsFollow:      isFollow,
+		}
+	}
+
+	//reply, err := conn.Receive()
+	//if err != nil {
+	//	return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline Receive exception, myUid:%d, err:%s", myUid, err)
+	//}
+
+	//for _, value := range values {
+	//	fmt.Println(string(value.([]byte)))
+	//}
+
+	//fmt.Println(reply)
+
+	return followInfos, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"github.com/ClubWeGo/relationmicro/kitex_gen/relation"
 	"log"
 	"strconv"
 
@@ -280,4 +281,43 @@ func FindIsFollows(myUid int64, userIds []int64) (map[int64]int, error) {
 	}
 
 	return resMap, nil
+}
+
+// 批量获取关注信息
+func FindFollowInfos(myUid int64, userIds []int64) ([]*relation.FollowInfo, error) {
+	return redisUtil.GetFollowInfos(myUid, userIds)
+	//conn := redisUtil.GetConn()
+	//// 关注数
+	//// 粉丝数
+	//// 是否关注
+	//for _, userId := range userIds {
+	//	myFollowKey := redisUtil.GetFollowKey(myUid)
+	//	followKey := redisUtil.GetFollowKey(userId)
+	//	followerKey := redisUtil.GetFollowerKey(userId)
+	//	// 关注数
+	//	if err := conn.Send("zcard", followKey); err != nil {
+	//		return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline send zcard exception, myUid:%d, key:%s err:%s", myUid, followKey, err)
+	//	}
+	//	// 粉丝数
+	//	if err := conn.Send("zcard", followerKey); err != nil {
+	//		return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline send zcard exception, myUid:%d, key:%s err:%s", myUid, followerKey, err)
+	//	}
+	//	// 是否关注, 是否存在我的关注集合中
+	//	if err := conn.Send("zrank", myFollowKey, userId); err != nil {
+	//		return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline send zrank exception, myUid:%d, key:%s, err:%s", myUid, myFollowKey, err)
+	//	}
+	//}
+	//if err := conn.Flush(); err != nil {
+	//	return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline flush exception, myUid:%d, err:%s", myUid, err)
+	//}
+	//reply, err := conn.Receive()
+	//if err != nil {
+	//	return []*relation.FollowInfo{}, fmt.Errorf("FindFollowInfos redis pipeline Receive exception, myUid:%d, err:%s", myUid, err)
+	//}
+	//if reply != nil {
+	//	fmt.Println("pipeline is not null")
+	//	//redisUtil.
+	//}
+	//
+	//return nil, nil
 }

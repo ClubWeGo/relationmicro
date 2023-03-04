@@ -75,12 +75,35 @@ func TestFindNoneFollow(t *testing.T) {
 
 func TestFindIsFollows(t *testing.T) {
 	userIds := []int64{2009, 20027}
-	isFollowMap, err := FindIsFollows(2006 , userIds)
+	isFollowMap, err := FindIsFollows(2006, userIds)
 	if err != nil {
 		t.Error(err)
 	}
 	for k, v := range isFollowMap {
 		fmt.Println(k, v)
+	}
+}
+
+func BenchmarkFollow(b *testing.B) {
+	//log.Info("压测")
+	targetUid := int64(-1)
+	for i := 0; i < b.N; i++ {
+		myUid := int64(i)
+		err := Follow(myUid, targetUid)
+		if err != nil {
+			b.Logf("执行异常, myUid:%d", myUid)
+		}
+	}
+}
+
+func TestFindFollowInfos(t *testing.T) {
+	userIds := []int64{2001, 2009, 21, 2005}
+	followInfos, err := FindFollowInfos(2001, userIds)
+	if err != nil {
+		t.Error(err)
+	}
+	for _, followInfo := range followInfos {
+		fmt.Println(followInfo)
 	}
 }
 

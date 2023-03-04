@@ -30,6 +30,7 @@ func NewServiceInfo() *kitex.ServiceInfo {
 		"GetFollowerListMethod": kitex.NewMethodInfo(getFollowerListMethodHandler, newRelationServiceGetFollowerListMethodArgs, newRelationServiceGetFollowerListMethodResult, false),
 		"GetFriendListMethod":   kitex.NewMethodInfo(getFriendListMethodHandler, newRelationServiceGetFriendListMethodArgs, newRelationServiceGetFriendListMethodResult, false),
 		"GetIsFollowsMethod":    kitex.NewMethodInfo(getIsFollowsMethodHandler, newRelationServiceGetIsFollowsMethodArgs, newRelationServiceGetIsFollowsMethodResult, false),
+		"GetFollowInfosMethod":  kitex.NewMethodInfo(getFollowInfosMethodHandler, newRelationServiceGetFollowInfosMethodArgs, newRelationServiceGetFollowInfosMethodResult, false),
 		"GetAllMessageMethod":   kitex.NewMethodInfo(getAllMessageMethodHandler, newMessageServiceGetAllMessageMethodArgs, newMessageServiceGetAllMessageMethodResult, false),
 		"SendMessageMethod":     kitex.NewMethodInfo(sendMessageMethodHandler, newMessageServiceSendMessageMethodArgs, newMessageServiceSendMessageMethodResult, false),
 	}
@@ -156,6 +157,24 @@ func newRelationServiceGetIsFollowsMethodResult() interface{} {
 	return relation.NewRelationServiceGetIsFollowsMethodResult()
 }
 
+func getFollowInfosMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
+	realArg := arg.(*relation.RelationServiceGetFollowInfosMethodArgs)
+	realResult := result.(*relation.RelationServiceGetFollowInfosMethodResult)
+	success, err := handler.(relation.RelationService).GetFollowInfosMethod(ctx, realArg.Request)
+	if err != nil {
+		return err
+	}
+	realResult.Success = success
+	return nil
+}
+func newRelationServiceGetFollowInfosMethodArgs() interface{} {
+	return relation.NewRelationServiceGetFollowInfosMethodArgs()
+}
+
+func newRelationServiceGetFollowInfosMethodResult() interface{} {
+	return relation.NewRelationServiceGetFollowInfosMethodResult()
+}
+
 func getAllMessageMethodHandler(ctx context.Context, handler interface{}, arg, result interface{}) error {
 	realArg := arg.(*relation.MessageServiceGetAllMessageMethodArgs)
 	realResult := result.(*relation.MessageServiceGetAllMessageMethodResult)
@@ -257,6 +276,16 @@ func (p *kClient) GetIsFollowsMethod(ctx context.Context, request *relation.GetI
 	_args.Request = request
 	var _result relation.RelationServiceGetIsFollowsMethodResult
 	if err = p.c.Call(ctx, "GetIsFollowsMethod", &_args, &_result); err != nil {
+		return
+	}
+	return _result.GetSuccess(), nil
+}
+
+func (p *kClient) GetFollowInfosMethod(ctx context.Context, request *relation.GetFollowInfosReq) (r *relation.GetFollowInfosResp, err error) {
+	var _args relation.RelationServiceGetFollowInfosMethodArgs
+	_args.Request = request
+	var _result relation.RelationServiceGetFollowInfosMethodResult
+	if err = p.c.Call(ctx, "GetFollowInfosMethod", &_args, &_result); err != nil {
 		return
 	}
 	return _result.GetSuccess(), nil
