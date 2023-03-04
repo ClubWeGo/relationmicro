@@ -62,14 +62,16 @@ func main() {
 	//	fmt.Println(user)
 	//}
 
-	followerList, err := client.GetFollowerListMethod(context.Background(), &relation.GetFollowerListReq{MyId: myUid, TargetId: 2009})
+	_, err = client.GetFollowerListMethod(context.Background(), &relation.GetFollowerListReq{MyId: myUid, TargetId: 2009})
 	if err != nil {
 		log.Println(err)
 	}
-	fmt.Println("有参followerList")
-	for _, user := range followerList.GetUserList() {
-		fmt.Println(user)
-	}
+	//fmt.Println("有参followerList")
+	//for _, user := range followerList.GetUserList() {
+	//	if user != nil {
+	//		fmt.Println(user)
+	//	}
+	//}
 
 
 
@@ -80,8 +82,13 @@ func main() {
 	friendList, err := client.GetFriendListMethod(context.Background(), &relation.GetFriendListReq{MyUid: myUid, TargetUid: 2})
 
 	fmt.Println("有参friendList")
-	for _, friend := range friendList.GetFriendList() {
-		fmt.Println(friend)
+	if err == nil {
+		for _, friend := range friendList.GetFriendList() {
+			if friend != nil {
+				fmt.Println(friend.Name)
+			}
+			//fmt.Println(friend)
+		}
 	}
 
 
@@ -92,5 +99,14 @@ func main() {
 	for k, v := range resp.GetIsFollowMap() {
 		fmt.Println(k, v)
 	}
+
+	userIds = []int64{-1, 2009, 2005}
+	infosResp, err := client.GetFollowInfosMethod(context.Background(), &relation.GetFollowInfosReq{MyUid: 2001, UserIds: userIds})
+
+	fmt.Println("GetFollowInfosMethod")
+	for _, info := range infosResp.FollowInfoList {
+		fmt.Println(info)
+	}
+
 
 }
